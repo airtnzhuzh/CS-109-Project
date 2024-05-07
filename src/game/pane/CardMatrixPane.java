@@ -81,7 +81,7 @@ public class CardMatrixPane extends StackPane {
 	private void setGridSizeAndCardFont(){
 		double w=widthProperty().get();
 		double h=heightProperty().get();
-		double min=w<h?w:h;
+		double min= Math.min(w, h);
 		gridPane.setMaxWidth(min);
 		gridPane.setMaxHeight(min);
 		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
@@ -145,7 +145,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向上操作*/
-	private void goUp() {
+	 void goUp() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -175,7 +175,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向下操作*/
-	private void goDown() {
+	 void goDown() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -191,7 +191,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向左操作*/
-	private void goLeft() {
+	void goLeft() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -221,7 +221,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向右操作*/
-	private void goRight() {
+	void goRight() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false

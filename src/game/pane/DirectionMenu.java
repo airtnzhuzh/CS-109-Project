@@ -1,36 +1,25 @@
 package edu.sustech.game.pane;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 // 这是一个用于处理按钮点击事件的外部类
-class DirectionHandler {
-    void moveUp() {
-        System.out.println("Moving up!");
-    }
 
-    void moveDown() {
-        System.out.println("Moving down!");
-    }
 
-    void moveLeft() {
-        System.out.println("Moving left!");
-    }
 
-    void moveRight() {
-        System.out.println("Moving right!");
-    }
-}
 
 // JavaFX 应用程序
-public class DirectionMenu extends Application {
-    @Override
-    public void start(Stage primaryStage) {
-        // 创建外部处理程序对象
-        DirectionHandler handler = new DirectionHandler();
+public class DirectionMenu  {
+    private CardMatrixPane cardMatrixPane;
+//    private HBox menu;
+private VBox menu;
+
+    public DirectionMenu(CardMatrixPane cardMatrixPane) {
 
         // 创建按钮
         Button upButton = new Button("Up");
@@ -38,28 +27,43 @@ public class DirectionMenu extends Application {
         Button leftButton = new Button("Left");
         Button rightButton = new Button("Right");
 
+        // 调整尺寸
+        upButton.setMinSize(80, 80);
+        downButton.setMinSize(80, 80);
+        leftButton.setMinSize(80, 80);
+        rightButton.setMinSize(80, 80);
+
         // 设置事件处理程序
-        upButton.setOnAction(e -> handler.moveUp());
-        downButton.setOnAction(e -> handler.moveDown());
-        leftButton.setOnAction(e -> handler.moveLeft());
-        rightButton.setOnAction(e -> handler.moveRight());
+        upButton.setOnAction(e -> cardMatrixPane.goUp());
+        downButton.setOnAction(e -> cardMatrixPane.goDown());
+        leftButton.setOnAction(e -> cardMatrixPane.goLeft());
+        rightButton.setOnAction(e -> cardMatrixPane.goRight());
 
-        // 使用 HBox 布局来排列按钮
-        HBox menu = new HBox(10); // 布局中10个单位的间距
-        menu.getChildren().addAll(leftButton, upButton, downButton, rightButton);
+// 初始化 HBox 布局
+//        menu = new HBox(10); // 间距 10
+//        menu.getChildren().addAll(leftButton, upButton, downButton, rightButton);
 
-        // 创建 BorderPane 布局
-        BorderPane root = new BorderPane();
-        root.setBottom(menu); // 将 HBox 添加到 BorderPane 的底部
+        HBox horizontalButtons = new HBox(100, leftButton, rightButton); // 左右排列
+        VBox verticalButtons = new VBox(10, upButton, horizontalButtons, downButton); // 上、中、下排列
 
-        // 创建场景并设置在舞台上
-        Scene scene = new Scene(root, 300, 200);
-        primaryStage.setTitle("Direction Menu Example");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        // 居中对齐
+        verticalButtons.setAlignment(Pos.CENTER);
+
+        menu = verticalButtons;
+
+
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public VBox getLayout() {
+        return menu;
     }
+
+
+
+
+
+
+
+
+
 }

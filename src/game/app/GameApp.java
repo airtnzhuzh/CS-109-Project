@@ -1,6 +1,7 @@
 package edu.sustech.game.app;
 
 import edu.sustech.game.pane.CardMatrixPane;
+import edu.sustech.game.pane.DirectionMenu;
 import edu.sustech.game.pane.GameCallbacks;
 import edu.sustech.game.pane.GameMenuBar;
 import javafx.application.Application;
@@ -27,13 +28,19 @@ public class GameApp extends Application implements GameCallbacks {
 		
 		//Top菜单栏
 		menuBar=new GameMenuBar(this);//创建菜单栏,并传入Application供调用
-		borderPane.setTop(menuBar);//顶部
-		
+		borderPane.setTop(menuBar);
+
+
 		//Center2048卡片矩阵
 		cardMatrixPane=new CardMatrixPane(this);
 		cardMatrixPane.setPadding(new Insets(5,5,5,5));//外边距
 		borderPane.setCenter(cardMatrixPane);//中心
-		
+
+		//Right方向按钮
+		DirectionMenu directionMenu = new DirectionMenu(cardMatrixPane);
+		borderPane.setRight(directionMenu.getLayout());
+		borderPane.setPadding(new Insets(5,5,5,5));
+
 		primaryStage.setTitle("2048");
 		primaryStage.setScene(scene);
 		primaryStage.show();
