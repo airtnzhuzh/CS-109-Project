@@ -113,11 +113,18 @@ public class CardMatrixPane extends StackPane {
 	}
 	/**添加键盘监听*/
 	public void createKeyListener() {
+		requestFocus();
 		System.out.println("test04");
 		setOnKeyPressed(e->{//键盘按下事件
 			System.out.println("test05");
 			if(!beforeAction()) return;//动作前
 			KeyCode kc=e.getCode();
+
+			// 如果是左右箭头键，阻止默认行为
+			if (kc == KeyCode.LEFT || kc == KeyCode.RIGHT) {
+				e.consume(); // 阻止事件传播，避免焦点切换
+			}
+
 			switch(kc) {
 				case UP:
 				case W:

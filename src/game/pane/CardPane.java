@@ -1,11 +1,13 @@
 package edu.sustech.game.pane;
 
 import edu.sustech.game.config.CardColor;
+import javafx.animation.TranslateTransition;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
- 
+import javafx.util.Duration;
+
 /**
  * 数字卡片
  * 
@@ -101,16 +103,42 @@ public class CardPane extends BorderPane {
 	public boolean tryMergeOrMoveInto(CardPane card) {
 		boolean canMergeOrMove=canMergeOrMove(card);
 		if(canMergeOrMove) {//可以移动或合并
-			if(card.getType()==0) {//移动
+
+			TranslateTransition slide = new TranslateTransition(Duration.seconds(0.5), this);
+//
+//			// 设置滑动方向和距离，假设横向滑动
+//			if (card.getType() == 0) { // 移动
+//				slide.setByX(card.getPrefHeight()); // 假设每个卡片的宽度是100
+//				slide.setOnFinished(e -> {
+//					card.setType(this.getType());
+//					card.setMerge(merge);
+//					this.toVoid();
+//				});
+//			} else { // 合并
+//				slide.setByX(100); // 同样假设横向滑动
+//				slide.setOnFinished(e -> {
+//					card.setType(card.getType() + 1);
+//					card.setMerge(true);
+//					this.toVoid();
+//				});
+//			}
+//
+//			slide.play(); // 开始动画
+
+
+			if (card.getType() == 0) {//移动
+				slide.setByX(card.getPrefHeight());
 				card.setType(type);//移动数字
 				card.setMerge(merge);//移动合并记录
 				this.toVoid();//this成为空卡片
-			}else {//合并
-				card.setType(card.getType()+1);//合并数字
+			} else {//合并
+				card.setType(card.getType() + 1);//合并数字
 				card.setMerge(true);//设置合并记录
 				this.toVoid();//this成为空卡片
 			}
+			slide.play();
 		}
+
 		return canMergeOrMove;
 	}
 	
