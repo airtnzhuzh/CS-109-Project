@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -29,6 +30,8 @@ public class CardMatrixPane extends StackPane {
 	public CardMatrixPane(Application application) {
 		this(4,4,application);//默认4*4
 	}
+
+
 	
 	public CardMatrixPane(int cols,int rows,Application application) {//application供回调方法使用
 		mCallbacks=(GameCallbacks)application;
@@ -38,6 +41,7 @@ public class CardMatrixPane extends StackPane {
 		init();
 		getChildren().add(gridPane);
 	}
+	public CardMatrixPane(){};
 	
 	/**获取分数*/
 	public long getScore() {
@@ -95,57 +99,75 @@ public class CardMatrixPane extends StackPane {
 		}
 	}
 	
+	public boolean beforeAction() {
+		CardPane maxCard=getMaxCard();//最大卡片
+		if(maxCard.getType()==16) {//出现最大数字
+			Alert alert=new Alert(Alert.AlertType.INFORMATION);
+			alert.setTitle(alert.getAlertType().toString());
+			alert.setContentText("恭喜你,游戏的最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n"+
+					"事实上,我们还尚未准备比"+maxCard.getNumber()+"更大的数字卡片,终点已至");
+			alert.show();
+			return false;
+		}
+		else return true;
+	}
 	/**添加键盘监听*/
 	public void createKeyListener() {
+		System.out.println("test04");
 		setOnKeyPressed(e->{//键盘按下事件
-			CardPane maxCard=getMaxCard();//最大卡片
-			if(maxCard.getType()==16) {//出现最大数字
-				Alert alert=new Alert(AlertType.INFORMATION);
-				alert.setTitle(alert.getAlertType().toString());
-				alert.setContentText("恭喜你,游戏的最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n"+
-						"事实上,我们还尚未准备比"+maxCard.getNumber()+"更大的数字卡片,终点已至");
-				alert.show();
-				return;
-			}
+			System.out.println("test05");
+			if(!beforeAction()) return;//动作前
 			KeyCode kc=e.getCode();
 			switch(kc) {
-			case UP:
-			case W:
-				goUp();//↑
-				break;
-			case DOWN:
-			case S:
-				goDown();//↓
-				break;
-			case LEFT:
-			case A:
-				goLeft();//←
-				break;
-			case RIGHT:
-			case D:
-				goRight();//→
-				break;
-			default:
-				return;//未定义的操作
+				case UP:
+				case W:
+					System.out.println("goUp02");
+					goUp();//↑
+					break;
+				case DOWN:
+				case S:
+					goDown();//↓
+					break;
+				case LEFT:
+				case A:
+					goLeft();//←
+					break;
+				case RIGHT:
+				case D:
+					goRight();//→
+					break;
+				default:
+					return;//未定义的操作
 			}
-			redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数
-			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
-			if(isFull) {//矩阵已满,可能已经游戏结束
-				boolean testOpe=false;//是否还能进行横向或竖向操作
-				testOpe|=testUp();//还能进行竖向操作
-				testOpe|=testLeft();//还能进行横向操作
-				if(!testOpe) {//游戏结束
-					Alert alert=new Alert(AlertType.INFORMATION);
-					alert.setTitle(alert.getAlertType().toString());
-					alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
-					alert.show();
-				}
-			}
+			//动作后
+			afterAction();
+
 		});
 	}
+
+	public void afterAction() {
+		CardPane maxCard=getMaxCard();//最大卡片
+		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+
+		boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+		if(isFull) {//矩阵已满,可能已经游戏结束
+			boolean testOpe=false;//是否还能进行横向或竖向操作
+			testOpe|=testUp();//还能进行竖向操作
+			testOpe|=testLeft();//还能进行横向操作
+			if(!testOpe) {//游戏结束
+				Alert alert=new Alert(Alert.AlertType.INFORMATION);
+				alert.setTitle(alert.getAlertType().toString());
+				alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
+				alert.show();
+			}
+		}
+	}
+
+
 	
 	/**向上操作*/
-	 void goUp() {
+	public void goUp() {
+		System.out.println("goUp01");
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -175,7 +197,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向下操作*/
-	 void goDown() {
+	public void goDown() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -191,7 +213,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向左操作*/
-	void goLeft() {
+	public void goLeft() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false
@@ -221,7 +243,7 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	/**向右操作*/
-	void goRight() {
+	public void goRight() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
 		do {
 			mergeOrMoveExist=false;//初始为false

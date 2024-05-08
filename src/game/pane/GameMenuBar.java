@@ -20,6 +20,7 @@ public class GameMenuBar extends MenuBar {
 	
 	public GameMenuBar(Application application) {//application供回调方法使用
 		mCallbacks=(GameCallbacks)application;
+
 		//Game菜单
 		Menu gameMenu=new Menu("游戏");//游戏
 		MenuItem restartMenuItem=new MenuItem("重新开始");//重新开始

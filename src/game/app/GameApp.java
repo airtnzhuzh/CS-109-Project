@@ -1,5 +1,6 @@
 package edu.sustech.game.app;
 
+import edu.sustech.game.control.GameController;
 import edu.sustech.game.pane.CardMatrixPane;
 import edu.sustech.game.pane.DirectionMenu;
 import edu.sustech.game.pane.GameCallbacks;
@@ -20,6 +21,7 @@ public class GameApp extends Application implements GameCallbacks {
 	private BorderPane borderPane;
 	private GameMenuBar menuBar;
 	private CardMatrixPane cardMatrixPane;
+	private GameController gameController;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -33,6 +35,7 @@ public class GameApp extends Application implements GameCallbacks {
 
 		//Center2048卡片矩阵
 		cardMatrixPane=new CardMatrixPane(this);
+		gameController=new GameController(cardMatrixPane);
 		cardMatrixPane.setPadding(new Insets(5,5,5,5));//外边距
 		borderPane.setCenter(cardMatrixPane);//中心
 
@@ -57,6 +60,7 @@ public class GameApp extends Application implements GameCallbacks {
 	private void startGame() {
 		cardMatrixPane.requestFocus();//添加焦点
 		cardMatrixPane.createKeyListener();//添加键盘监听
+		System.out.println("test03");
 		afterScoreChange();
 	}
  

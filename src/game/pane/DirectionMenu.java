@@ -14,10 +14,10 @@ import javafx.stage.Stage;
 
 
 // JavaFX 应用程序
-public class DirectionMenu  {
+public class DirectionMenu extends CardMatrixPane  {
     private CardMatrixPane cardMatrixPane;
 //    private HBox menu;
-private VBox menu;
+private final VBox menu;
 
     public DirectionMenu(CardMatrixPane cardMatrixPane) {
 
@@ -33,11 +33,17 @@ private VBox menu;
         leftButton.setMinSize(80, 80);
         rightButton.setMinSize(80, 80);
 
+
+        beforeAction();
+
         // 设置事件处理程序
         upButton.setOnAction(e -> cardMatrixPane.goUp());
         downButton.setOnAction(e -> cardMatrixPane.goDown());
         leftButton.setOnAction(e -> cardMatrixPane.goLeft());
         rightButton.setOnAction(e -> cardMatrixPane.goRight());
+
+        afterAction();
+
 
 // 初始化 HBox 布局
 //        menu = new HBox(10); // 间距 10
