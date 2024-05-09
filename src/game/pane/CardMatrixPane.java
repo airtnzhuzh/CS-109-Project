@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.sustech.game.app.Game;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.application.Platform;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
- 
+import javafx.util.Duration;
+
 /**
  * 卡片矩阵
  * 
@@ -136,32 +141,32 @@ public class CardMatrixPane extends StackPane {
 			keyProcessed = true; // 标记键已经处理
 			if(!beforeAction()) return;//动作前
 
-
-
 			switch(kc) {
 				case UP:
 				case W:
 					System.out.println("goUp02");
 					goUp();//↑
+					afterAction();
 					break;
 				case DOWN:
 				case S:
 					goDown();//↓
+					afterAction();
 					break;
 				case LEFT:
 				case A:
 					goLeft();//←
+					afterAction();
 					break;
 				case RIGHT:
 				case D:
 					goRight();//→
+					afterAction();
 					break;
 				default:
 					return;//未定义的操作
 			}
-			//动作后
 
-			afterAction();
 
 		});
 		setOnKeyReleased(e -> {
@@ -173,8 +178,15 @@ public class CardMatrixPane extends StackPane {
 	public void afterAction() {
 		CardPane maxCard=getMaxCard();//最大卡片
 		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+		System.out.println("重绘所有卡片");
 
+
+
+
+		System.out.println("随机生成数字");
 		boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+
+
 		if(isFull) {//矩阵已满,可能已经游戏结束
 			boolean testOpe=false;//是否还能进行横向或竖向操作
 			testOpe|=testUp();//还能进行竖向操作
@@ -285,18 +297,20 @@ public class CardMatrixPane extends StackPane {
 	
 	/**重绘所有的卡片,并重设合并记录,并设置分数*/
 	private void redrawAllCardsAndResetIsMergeAndSetScore() {
-		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
-			for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
-				CardPane card=cps[i][j];
-				card.draw();
-				if(card.isMerge()) {//这张卡片合并过
-					score+=card.getNumber();//计入分数
-					mcQuantities[card.getType()-2]++;//相应的合并过的卡片数字数量+1
-					card.setMerge(false);
-				}
-			}
-		}
+
+					for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
+						for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
+							CardPane card = cps[i][j];
+							card.draw();
+							if (card.isMerge()) {//这张卡片合并过
+								score += card.getNumber();//计入分数
+								mcQuantities[card.getType() - 2]++;//相应的合并过的卡片数字数量+1
+								card.setMerge(false);
+							}
+						}
+					}
 		mCallbacks.afterScoreChange();
+		cps[0][0].getParent().requestLayout();
 	}
 	
 	/**获取卡片矩阵中的最大卡片*/
@@ -341,7 +355,19 @@ public class CardMatrixPane extends StackPane {
 		int voidCardIndex=(int)(Math.random()*len);
 		CardPane card=voidCards.get(voidCardIndex);
 		card.setType(type);//更新type,生成数字
+
+
+
+		FadeTransition ft = new FadeTransition(Duration.millis(200), card);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setCycleCount(1);
+		ft.setAutoReverse(true);
+		ft.play();
 		card.draw();//重绘此卡片
+
+
+
 		if(len==1) {//只有一个空卡片,矩阵生成数字后满
 			return false;
 		}

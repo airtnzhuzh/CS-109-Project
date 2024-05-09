@@ -1,9 +1,11 @@
 package edu.sustech.game.pane;
 
 import edu.sustech.game.config.CardColor;
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -14,7 +16,7 @@ import javafx.util.Duration;
  */
 //若继承自Pane类,缺少需要的setAlignment()方法
 //若继承自StackPane类,会出现一些绘制错误
-public class CardPane extends BorderPane {
+public class CardPane extends BorderPane implements Cloneable{
 	private static final int RC=5;//矩形的圆角
 	private int type;
 	/* 类型
@@ -80,6 +82,12 @@ public class CardPane extends BorderPane {
 	/**绘制单次操作中卡片变化的部分,包括颜色和显示的数字*/
 	public void draw() {
 		if(merge) {//突出显示已合并的卡片
+		ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(50), r);
+		scaleTransition.setToX(1.2f);
+		scaleTransition.setToY(1.2f);
+		scaleTransition.setCycleCount(2);
+		scaleTransition.setAutoReverse(true);
+		scaleTransition.play();
 			r.setStroke(Color.RED);//此次操作中合并,显示红色
 		}else {
 			r.setStroke(Color.BLACK);//此次操作中没有合并,显示黑色
@@ -100,34 +108,21 @@ public class CardPane extends BorderPane {
 	}
 	
 	/**尝试向调用者所给出的卡片移动或合并,这一函数可能会修改两个卡片的属性*/
-	public boolean tryMergeOrMoveInto(CardPane card) {
+	public boolean tryMergeOrMoveInto(CardPane card)  {
 		boolean canMergeOrMove=canMergeOrMove(card);
 		if(canMergeOrMove) {//可以移动或合并
 
-			TranslateTransition slide = new TranslateTransition(Duration.seconds(0.5), this);
+//			Pane parent = (Pane) this.getParent();
+//			CardPane copy = this.createCopy();
+//			parent.getChildren().add(copy);
 //
-//			// 设置滑动方向和距离，假设横向滑动
-//			if (card.getType() == 0) { // 移动
-//				slide.setByX(card.getPrefHeight()); // 假设每个卡片的宽度是100
-//				slide.setOnFinished(e -> {
-//					card.setType(this.getType());
-//					card.setMerge(merge);
-//					this.toVoid();
-//				});
-//			} else { // 合并
-//				slide.setByX(100); // 同样假设横向滑动
-//				slide.setOnFinished(e -> {
-//					card.setType(card.getType() + 1);
-//					card.setMerge(true);
-//					this.toVoid();
-//				});
-//			}
-//
-//			slide.play(); // 开始动画
+//			TranslateTransition slide = new TranslateTransition(Duration.seconds(0.2), copy);
+//			slide.setToX(card.getLayoutX() - copy.getLayoutX());
+//			slide.setToY(card.getLayoutY() - copy.getLayoutY());
+
 
 
 			if (card.getType() == 0) {//移动
-//				slide.setByX(card.getPrefHeight());
 				card.setType(type);//移动数字
 				card.setMerge(merge);//移动合并记录
 				this.toVoid();//this成为空卡片
@@ -136,10 +131,20 @@ public class CardPane extends BorderPane {
 				card.setMerge(true);//设置合并记录
 				this.toVoid();//this成为空卡片
 			}
+
 //			slide.play();
+//			copy.createCopy();
 		}
 
 		return canMergeOrMove;
+	}
+
+	public CardPane createCopy() {
+		CardPane copy = new CardPane();
+		copy.setType(this.type);
+		copy.setLayoutX(this.getLayoutX());
+		copy.setLayoutY(this.getLayoutY());
+		return copy;
 	}
 	
 	/**刷新为空卡片*/
@@ -165,4 +170,18 @@ public class CardPane extends BorderPane {
 	public String toString() {
 		return "[type="+type+", merge="+merge+"]";
 	}
+
+	@Override
+	protected CardPane clone() {
+		CardPane clone = null;
+		try{
+			clone = (CardPane) super.clone();
+
+		}catch(CloneNotSupportedException e){
+			throw new RuntimeException(e); // won't happen
+		}
+
+		return clone;
+	}
+
 }
