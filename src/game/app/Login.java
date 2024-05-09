@@ -28,8 +28,6 @@ public class Login extends Application{
         Label l_name = new Label("账号:");
         l_name.setFont(Font.font(15));
 
-
-
         Label l_password = new Label("密码:");
         l_password.setFont(Font.font(15));
 
@@ -45,20 +43,26 @@ public class Login extends Application{
         Button login = new Button("登录");
         Button clear = new Button("清除");
         Button register = new Button("注册");
-
         Button guest = new Button("游客模式");
+
+        guest.setMinSize(200, 35);//调整guest按钮尺寸
+
+        guest.setFont(Font.font(15)); //调整guest内部字的大小
+
+
 
 
         GridPane gr=new GridPane();
         gr.setStyle("-fx-background-color: #FFF0F5");
 
-        gr.add(l_name,0,0);
-        gr.add(t_name,1,0);
-        gr.add(l_password,0,1);
-        gr.add(p_password,1,1);
-        gr.add(clear,0,2);
-        gr.add(register,1,2);
-        gr.add(login,1,2);
+        gr.add(guest,1,0);
+        gr.add(l_name,0,1);
+        gr.add(t_name,1,1);
+        gr.add(l_password,0,2);
+        gr.add(p_password,1,2);
+        gr.add(clear,0,3);
+        gr.add(register,1,3);
+        gr.add(login,1,3);
 
         gr.setHgap(5);
         gr.setVgap(15);
@@ -103,9 +107,38 @@ public class Login extends Application{
             }
 
         });
+
+        login.setOnAction(event -> {
+            String name = t_name.getText();
+            String password = p_password.getText();
+            try {
+                if (UserAuth.login(name, password)){
+                    primaryStage.close();
+                    new Game(this).startGame();
+                    Success success = new Success("登录");
+                }else{
+                    primaryStage.setTitle("账号或者密码错误");
+                    FadeTransition fade = new FadeTransition();
+                    fade.setDuration(Duration.seconds(0.1));
+                    fade.setNode(gr);
+                    fade.setFromValue(0);
+                    fade.setToValue(1);
+                    fade.play();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        });
         register.setOnAction(event -> {
                 Signup signup = new Signup(primaryStage);
                 primaryStage.close();
+        });
+
+        guest.setOnAction(event -> {
+            primaryStage.close();
+            new Game(this).startGame();
+            Success success = new Success("登录");
         });
     }
 }

@@ -15,6 +15,6 @@ public class GameController extends Pane {
         this.cardMatrixPane = cardMatrixPane;
     }
 
-
+//这个类暂时没有用
 
 }
