@@ -2,7 +2,8 @@ package edu.sustech.game.pane;
 
 import java.util.ArrayList;
 import java.util.List;
- 
+
+import edu.sustech.game.app.Game;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -24,17 +25,19 @@ public class CardMatrixPane extends StackPane {
 	private GridPane gridPane;//卡片矩阵容器
 	private CardPane[][] cps;//卡片矩阵
 	private long score=0;//分数,初始为0
+
+	private boolean keyProcessed = false;//键是否已经处理
 	private int[] mcQuantities=new int[15];//合并过的卡片数字数量,包括4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536
 	
 	
-	public CardMatrixPane(Application application) {
-		this(4,4,application);//默认4*4
+	public CardMatrixPane(Game game) {
+		this(4,4,game);//默认4*4
 	}
 
 
 	
-	public CardMatrixPane(int cols,int rows,Application application) {//application供回调方法使用
-		mCallbacks=(GameCallbacks)application;
+	public CardMatrixPane(int cols, int rows, Game game) {//application供回调方法使用
+		mCallbacks=(GameCallbacks)game;
 		this.cols=cols;
 		this.rows=rows;
 //		this.setBackground(new Background(new BackgroundFill(Color.BLUE,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
@@ -68,8 +71,8 @@ public class CardMatrixPane extends StackPane {
 		widthProperty().addListener(ov->setGridSizeAndCardFont());//宽度变化,更新边长和字号
 		heightProperty().addListener(ov->setGridSizeAndCardFont());//高度变化,更新边长和字号
 		//单元格间隙
-		gridPane.setHgap(5);
-		gridPane.setVgap(5);
+		gridPane.setHgap(20);
+		gridPane.setVgap(20);
 		//绘制每个单元格
 		cps=new CardPane[cols][rows];
 		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
@@ -113,17 +116,27 @@ public class CardMatrixPane extends StackPane {
 	}
 	/**添加键盘监听*/
 	public void createKeyListener() {
+
 		requestFocus();
 		System.out.println("test04");
 		setOnKeyPressed(e->{//键盘按下事件
 			System.out.println("test05");
-			if(!beforeAction()) return;//动作前
+
 			KeyCode kc=e.getCode();
 
 			// 如果是左右箭头键，阻止默认行为
 			if (kc == KeyCode.LEFT || kc == KeyCode.RIGHT) {
 				e.consume(); // 阻止事件传播，避免焦点切换
 			}
+			// 如果键已经处理，直接返回
+			if (keyProcessed) {
+				return;
+			}
+
+			keyProcessed = true; // 标记键已经处理
+			if(!beforeAction()) return;//动作前
+
+
 
 			switch(kc) {
 				case UP:
@@ -147,8 +160,13 @@ public class CardMatrixPane extends StackPane {
 					return;//未定义的操作
 			}
 			//动作后
+
 			afterAction();
 
+		});
+		setOnKeyReleased(e -> {
+			// 重置标记，允许处理下一个键盘事件
+			keyProcessed = false;
 		});
 	}
 

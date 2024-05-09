@@ -43,7 +43,7 @@ public class CardPane extends BorderPane {
 		r.setArcWidth(RC);//圆角宽度
 		r.setArcHeight(RC);//圆角高度
 		r.setStroke(Color.BLACK);//边框颜色
-		r.setStrokeWidth(3);//边框宽度
+		r.setStrokeWidth(4);//边框宽度
 		getChildren().add(r);
 		//数字标签
 		l=new Label("65536");//65536是4*4情况下可能出现的最大数字
@@ -127,7 +127,7 @@ public class CardPane extends BorderPane {
 
 
 			if (card.getType() == 0) {//移动
-				slide.setByX(card.getPrefHeight());
+//				slide.setByX(card.getPrefHeight());
 				card.setType(type);//移动数字
 				card.setMerge(merge);//移动合并记录
 				this.toVoid();//this成为空卡片
@@ -136,7 +136,7 @@ public class CardPane extends BorderPane {
 				card.setMerge(true);//设置合并记录
 				this.toVoid();//this成为空卡片
 			}
-			slide.play();
+//			slide.play();
 		}
 
 		return canMergeOrMove;

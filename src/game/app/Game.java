@@ -16,14 +16,15 @@ import javafx.stage.Stage;
  * 2048运行类
  *
  */
-public class GameApp extends Application implements GameCallbacks {
+public class Game  implements GameCallbacks {
 	private BorderPane borderPane;
 	private GameMenuBar menuBar;
 	private CardMatrixPane cardMatrixPane;
 	private DirectionMenu directionMenu;
 	
-	@Override
-	public void start(Stage primaryStage) {
+
+	public  Game(Application app) {
+		Stage stage = new Stage();
 		borderPane=new BorderPane();
 		Scene scene=new Scene(borderPane,900,600);
 		
@@ -42,20 +43,20 @@ public class GameApp extends Application implements GameCallbacks {
 		borderPane.setRight(directionMenu.getLayout());
 		borderPane.setPadding(new Insets(5,5,5,5));
 
-		primaryStage.setTitle("2048");
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		stage.setTitle("2048");
+		stage.setScene(scene);
+		stage.show();
 		
 		startGame();
 //		cardMatrixPane.testColors();//颜色测试
 	}
 	
-	public static void main(String[] args) {
-		Application.launch(args);
-	}
-	
+//	public static void main(String[] args) {
+//		Application.launch(args);
+//	}
+//
 	/**开始游戏*/
-	private void startGame() {
+	public void startGame() {
 		cardMatrixPane.requestFocus();//添加焦点
 		//directionMenu.getLayout().requestFocus();
 		cardMatrixPane.createKeyListener();//添加键盘监听

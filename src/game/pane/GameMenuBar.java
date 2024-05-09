@@ -1,5 +1,6 @@
 package edu.sustech.game.pane;
 
+import edu.sustech.game.app.Game;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -18,8 +19,8 @@ public class GameMenuBar extends MenuBar {
 	private GameCallbacks mCallbacks;
 	private Menu scoreMenu;
 	
-	public GameMenuBar(Application application) {//application供回调方法使用
-		mCallbacks=(GameCallbacks)application;
+	public GameMenuBar(Game game) {//application供回调方法使用
+		mCallbacks=(GameCallbacks)game;
 
 		//Game菜单
 		Menu gameMenu=new Menu("游戏");//游戏
