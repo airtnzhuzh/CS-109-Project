@@ -4,6 +4,7 @@ import edu.sustech.game.config.CardColor;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -16,7 +17,7 @@ import javafx.util.Duration;
  */
 //若继承自Pane类,缺少需要的setAlignment()方法
 //若继承自StackPane类,会出现一些绘制错误
-public class CardPane extends BorderPane implements Cloneable{
+public class CardPane extends BorderPane {
 	private static final int RC=5;//矩形的圆角
 	private int type;
 	/* 类型
@@ -51,7 +52,7 @@ public class CardPane extends BorderPane implements Cloneable{
 		l=new Label("65536");//65536是4*4情况下可能出现的最大数字
 		setCenter(l);
 		//绘制变化的部分
-		draw();
+		this.draw();
 	}
 	
 	/**获取数字标签对象*/
@@ -82,12 +83,12 @@ public class CardPane extends BorderPane implements Cloneable{
 	/**绘制单次操作中卡片变化的部分,包括颜色和显示的数字*/
 	public void draw() {
 		if(merge) {//突出显示已合并的卡片
-		ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(50), r);
-		scaleTransition.setToX(1.2f);
-		scaleTransition.setToY(1.2f);
-		scaleTransition.setCycleCount(2);
-		scaleTransition.setAutoReverse(true);
-		scaleTransition.play();
+//		ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(1000), r);
+//		scaleTransition.setToX(1.2f);
+//		scaleTransition.setToY(1.2f);
+//		scaleTransition.setCycleCount(2);
+//		scaleTransition.setAutoReverse(true);
+//		scaleTransition.play();
 			r.setStroke(Color.RED);//此次操作中合并,显示红色
 		}else {
 			r.setStroke(Color.BLACK);//此次操作中没有合并,显示黑色
@@ -139,13 +140,7 @@ public class CardPane extends BorderPane implements Cloneable{
 		return canMergeOrMove;
 	}
 
-	public CardPane createCopy() {
-		CardPane copy = new CardPane();
-		copy.setType(this.type);
-		copy.setLayoutX(this.getLayoutX());
-		copy.setLayoutY(this.getLayoutY());
-		return copy;
-	}
+
 	
 	/**刷新为空卡片*/
 	private void toVoid() {
@@ -171,17 +166,6 @@ public class CardPane extends BorderPane implements Cloneable{
 		return "[type="+type+", merge="+merge+"]";
 	}
 
-	@Override
-	protected CardPane clone() {
-		CardPane clone = null;
-		try{
-			clone = (CardPane) super.clone();
 
-		}catch(CloneNotSupportedException e){
-			throw new RuntimeException(e); // won't happen
-		}
-
-		return clone;
-	}
 
 }

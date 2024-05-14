@@ -5,10 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
+
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -24,7 +21,7 @@ public class DirectionMenu extends Pane {
     private CardMatrixPane cardMatrixPane;
 //    private HBox menu;
 private  VBox menu;
-    Application application;
+
 
     public DirectionMenu(CardMatrixPane cardMatrixPane) {
 

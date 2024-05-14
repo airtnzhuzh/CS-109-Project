@@ -1,9 +1,6 @@
 package edu.sustech.game.app;
 
-import edu.sustech.game.pane.CardMatrixPane;
-import edu.sustech.game.pane.DirectionMenu;
-import edu.sustech.game.pane.GameCallbacks;
-import edu.sustech.game.pane.GameMenuBar;
+import edu.sustech.game.pane.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -21,6 +18,7 @@ public class Game  implements GameCallbacks {
 	private GameMenuBar menuBar;
 	private CardMatrixPane cardMatrixPane;
 	private DirectionMenu directionMenu;
+	private GameAI gameAI;
 	
 
 	public  Game(Application app) {
@@ -42,6 +40,12 @@ public class Game  implements GameCallbacks {
 		directionMenu = new DirectionMenu(cardMatrixPane);
 		borderPane.setRight(directionMenu.getLayout());
 		borderPane.setPadding(new Insets(5,5,5,5));
+
+		//右上角增加GameAI
+		gameAI=new GameAI(cardMatrixPane);
+		borderPane.setLeft(gameAI.getLayout());
+		borderPane.setPadding(new Insets(5,5,5,5));
+
 
 		stage.setTitle("2048");
 		stage.setScene(scene);

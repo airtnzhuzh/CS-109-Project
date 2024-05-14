@@ -4,17 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.sustech.game.app.Game;
-import javafx.animation.FadeTransition;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
-import javafx.application.Application;
-import javafx.application.Platform;
+import edu.sustech.game.config.CardColor;
+import javafx.animation.*;
 import javafx.scene.control.Alert;
-import javafx.application.Platform;
+import javafx.scene.paint.*;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
@@ -108,6 +104,8 @@ public class CardMatrixPane extends StackPane {
 	}
 	
 	public boolean beforeAction() {
+
+
 		CardPane maxCard=getMaxCard();//最大卡片
 		if(maxCard.getType()==16) {//出现最大数字
 			Alert alert=new Alert(Alert.AlertType.INFORMATION);
@@ -180,24 +178,32 @@ public class CardMatrixPane extends StackPane {
 		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
 		System.out.println("重绘所有卡片");
 
+		// 创建一个暂停0.1秒的动画
+		PauseTransition pause = new PauseTransition(Duration.seconds(0.07));
 
+// 设置动画结束后的操作
+		pause.setOnFinished(event -> {
+			// 在这里添加你希望在暂停结束后执行的代码
+			System.out.println("随机生成数字");
+			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
-
-		System.out.println("随机生成数字");
-		boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
-
-
-		if(isFull) {//矩阵已满,可能已经游戏结束
-			boolean testOpe=false;//是否还能进行横向或竖向操作
-			testOpe|=testUp();//还能进行竖向操作
-			testOpe|=testLeft();//还能进行横向操作
-			if(!testOpe) {//游戏结束
-				Alert alert=new Alert(Alert.AlertType.INFORMATION);
-				alert.setTitle(alert.getAlertType().toString());
-				alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
-				alert.show();
+			if(isFull) {//矩阵已满,可能已经游戏结束
+				boolean testOpe=false;//是否还能进行横向或竖向操作
+				testOpe|=testUp();//还能进行竖向操作
+				testOpe|=testLeft();//还能进行横向操作
+				if(!testOpe) {//游戏结束
+					Alert alert=new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle(alert.getAlertType().toString());
+					alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
+					alert.show();
+				}
 			}
-		}
+		});
+
+// 开始动画
+		pause.play();
+
+
 	}
 
 
@@ -211,8 +217,13 @@ public class CardMatrixPane extends StackPane {
 			for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
 				for(int j=1;j<rows;j++) {//从第二行起向下,遍历卡片矩阵的行
 					CardPane card=cps[i][j];
+					CardPane tempcard = card;
 					CardPane preCard=cps[i][j-1];//前一个卡片
-					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
+					boolean isChanged=false;
+					if (card.tryMergeOrMoveInto(preCard)) {
+						animateMove(tempcard, i, j, i, j - 1); // 上移
+						isChanged = true;
+					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
 			}
@@ -243,6 +254,9 @@ public class CardMatrixPane extends StackPane {
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i][j+1];//前一个卡片
 					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
+					if (isChanged) {
+						animateMove(card, i, j, i, j + 1);
+					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
 			}
@@ -259,6 +273,9 @@ public class CardMatrixPane extends StackPane {
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i-1][j];//前一个卡片
 					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
+					if (isChanged) {
+						animateMove(card, i, j, i - 1, j);
+					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
 			}
@@ -289,6 +306,9 @@ public class CardMatrixPane extends StackPane {
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i+1][j];//前一个卡片
 					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
+					if (isChanged) {
+						animateMove(card, i, j, i + 1, j);
+					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
 			}
@@ -365,6 +385,19 @@ public class CardMatrixPane extends StackPane {
 		ft.setAutoReverse(true);
 		ft.play();
 		card.draw();//重绘此卡片
+		ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(70), card);
+		scaleTransition.setToX(1.2f);
+		scaleTransition.setToY(1.2f);
+		scaleTransition.setCycleCount(2);
+		scaleTransition.setAutoReverse(true);
+
+		scaleTransition.setOnFinished(event -> {
+			card.setScaleX(1.0);
+			card.setScaleY(1.0);
+		});
+
+		scaleTransition.play();
+
 
 
 
@@ -402,6 +435,35 @@ public class CardMatrixPane extends StackPane {
 				card.draw();//重绘
 			}
 		}
+	}
+	/**卡片移动的动画*/
+	private void animateMove(CardPane card, int fromCol, int fromRow, int toCol, int toRow)  {
+		// 创建一个复制卡片
+		CardPane copyCard = new CardPane(card.getNumber());
+		copyCard.setType(card.getType());
+		copyCard.setLayoutX(card.getLayoutX());
+		copyCard.setLayoutY(card.getLayoutY());
+		copyCard.getLabel().setText(card.getLabel().getText());
+		gridPane.getChildren().add(copyCard);
+
+		// 计算水平和垂直方向上的位移
+		double deltaX = (toCol - fromCol) * (card.getWidth() + gridPane.getHgap())*1.2;
+		double deltaY = (toRow - fromRow) * (card.getHeight() + gridPane.getVgap())*1.2;
+
+		// 设置复制卡片的初始位置为移动前卡片的位置
+		copyCard.setTranslateX(card.getLayoutX());
+		copyCard.setTranslateY(card.getLayoutY());
+
+		// 创建平移动画
+		TranslateTransition tt = new TranslateTransition(Duration.seconds(0.07), copyCard);
+		tt.setByX(deltaX);
+		tt.setByY(deltaY);
+		tt.setOnFinished(event -> {
+			// 动画结束后，更新GridPane中的卡片位置，并移除复制的卡片
+
+			gridPane.getChildren().remove(copyCard);
+		});
+		tt.play();
 	}
 }
 
