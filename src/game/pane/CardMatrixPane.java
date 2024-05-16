@@ -130,8 +130,8 @@ public class CardMatrixPane extends StackPane {
 		widthProperty().addListener(ov->setGridSizeAndCardFont());//宽度变化,更新边长和字号
 		heightProperty().addListener(ov->setGridSizeAndCardFont());//高度变化,更新边长和字号
 		//单元格间隙
-		gridPane.setHgap(20);
-		gridPane.setVgap(20);
+		gridPane.setHgap(5);
+		gridPane.setVgap(5);
 		//绘制每个单元格
 		cps=new CardPane[cols][rows];
 		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
@@ -265,6 +265,7 @@ public class CardMatrixPane extends StackPane {
 		//pause.setOnFinished(event -> {
 			//暂停结束后执行的代码
 			System.out.println("随机生成数字");
+
 			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
 			if(isFull) {//矩阵已满,可能已经游戏结束
@@ -332,12 +333,12 @@ public class CardMatrixPane extends StackPane {
 			for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
 				for(int j=1;j<rows;j++) {//从第二行起向下,遍历卡片矩阵的行
 					CardPane card=cps[i][j];
-					CardPane tempcard = card;
 					CardPane preCard=cps[i][j-1];//前一个卡片
 					boolean isChanged=false;
-					if (card.tryMergeOrMoveInto(preCard)) {
-						animateMove(tempcard, i, j, i, j - 1); // 上移
+					if (card.canMergeOrMove(preCard)) {
+						animateMove(card, i, j, i, j - 1); // 上移
 						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
 					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
@@ -358,7 +359,21 @@ public class CardMatrixPane extends StackPane {
 		}
 		return false;//不能
 	}
-	
+
+	/**测试是否能向下操作*/
+	private boolean testDown() {
+		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+			for(int j=rows-2;j>=0;j--) {//从倒数第二行起向上,遍历卡片矩阵的行
+				CardPane card=cps[i][j];
+				CardPane preCard=cps[i][j+1];//前一个卡片
+				if(card.canMergeOrMove(preCard)) {
+					return true;//能
+				}
+			}
+		}
+		return false;//不能
+	}
+
 	/**向下操作*/
 	public void goDown() {
 		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
@@ -368,9 +383,11 @@ public class CardMatrixPane extends StackPane {
 				for(int j=rows-2;j>=0;j--) {//从倒数第二行起向上,遍历卡片矩阵的行
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i][j+1];//前一个卡片
-					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
-					if (isChanged) {
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
 						animateMove(card, i, j, i, j + 1);
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
 					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
@@ -387,9 +404,11 @@ public class CardMatrixPane extends StackPane {
 				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i-1][j];//前一个卡片
-					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
-					if (isChanged) {
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
 						animateMove(card, i, j, i - 1, j);
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
 					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
@@ -410,6 +429,19 @@ public class CardMatrixPane extends StackPane {
 		}
 		return false;//不能
 	}
+	/**测试是否能向右操作*/
+	private boolean testRight() {
+		for(int i=cols-2;i>=0;i--) {//从倒数第二列起向左,遍历卡片矩阵的列
+			for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+				CardPane card=cps[i][j];
+				CardPane preCard=cps[i+1][j];//前一个卡片
+				if(card.canMergeOrMove(preCard)) {
+					return true;//能
+				}
+			}
+		}
+		return false;//不能
+	}
 	
 	/**向右操作*/
 	public void goRight() {
@@ -420,9 +452,11 @@ public class CardMatrixPane extends StackPane {
 				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
 					CardPane card=cps[i][j];
 					CardPane preCard=cps[i+1][j];//前一个卡片
-					boolean isChanged=card.tryMergeOrMoveInto(preCard);//记录两张卡片间是否进行了移动或合并
-					if (isChanged) {
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
 						animateMove(card, i, j, i + 1, j);
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
 					}
 					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
 				}
@@ -478,6 +512,7 @@ public class CardMatrixPane extends StackPane {
 		if(len==0) {//没有空卡片了,返回
 			return false;//判满
 		}
+
 		int type;
 		int index=(int)(Math.random()*5);//0,1,2,3,4
 		if(index!=0) {//4/5概率
@@ -554,28 +589,27 @@ public class CardMatrixPane extends StackPane {
 	/**卡片移动的动画*/
 	private void animateMove(CardPane card, int fromCol, int fromRow, int toCol, int toRow)  {
 		// 创建一个复制卡片
-		CardPane copyCard = new CardPane(card.getNumber());
-		copyCard.setType(card.getType());
+		CardPane copyCard = new CardPane(card.getType());
 		copyCard.setLayoutX(card.getLayoutX());
 		copyCard.setLayoutY(card.getLayoutY());
-		copyCard.getLabel().setText(card.getLabel().getText());
 		gridPane.getChildren().add(copyCard);
+		//更新copycard字号
+		copyCard.getLabel().setFont(card.getLabel().getFont());
 
 		// 计算水平和垂直方向上的位移
-		double deltaX = (toCol - fromCol) * (card.getWidth() + gridPane.getHgap())*1.2;
-		double deltaY = (toRow - fromRow) * (card.getHeight() + gridPane.getVgap())*1.2;
+		double deltaX = (toCol - fromCol) * (card.getWidth() + gridPane.getHgap())*1;
+		double deltaY = (toRow - fromRow) * (card.getHeight() + gridPane.getVgap())*1;
 
 		// 设置复制卡片的初始位置为移动前卡片的位置
 		copyCard.setTranslateX(card.getLayoutX());
 		copyCard.setTranslateY(card.getLayoutY());
 
 		// 创建平移动画
-		TranslateTransition tt = new TranslateTransition(Duration.seconds(0.5), copyCard);
+		TranslateTransition tt = new TranslateTransition(Duration.seconds(0.07), copyCard);
 		tt.setByX(deltaX);
 		tt.setByY(deltaY);
 		tt.setOnFinished(event -> {
 			// 动画结束后，更新GridPane中的卡片位置，并移除复制的卡片
-
 			gridPane.getChildren().remove(copyCard);
 		});
 		tt.play();
