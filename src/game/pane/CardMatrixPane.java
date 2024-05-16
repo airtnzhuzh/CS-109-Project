@@ -153,8 +153,8 @@ public class CardMatrixPane extends StackPane {
 		widthProperty().addListener(ov->setGridSizeAndCardFont());//宽度变化,更新边长和字号
 		heightProperty().addListener(ov->setGridSizeAndCardFont());//高度变化,更新边长和字号
 		//单元格间隙
-		gridPane.setHgap(20);
-		gridPane.setVgap(20);
+		gridPane.setHgap(5);
+		gridPane.setVgap(5);
 		//绘制每个单元格
 
 		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
@@ -593,6 +593,7 @@ public class CardMatrixPane extends StackPane {
 		copyCard.setLayoutX(card.getLayoutX());
 		copyCard.setLayoutY(card.getLayoutY());
 		gridPane.getChildren().add(copyCard);
+
 		//更新copycard字号
 		copyCard.getLabel().setFont(card.getLabel().getFont());
 
