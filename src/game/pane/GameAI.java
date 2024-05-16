@@ -43,9 +43,18 @@ public class GameAI  extends Pane {
 
         AllStepsButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
-            cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goRight();       // Main action logic
-            cardMatrixPane.afterAction(); // After action logic
+            int[] testkey = new int[1];
+            testkey[0] = 1;
+            while(true) {
+                if(testkey[0]==1) {
+                    cardMatrixPane.beforeAction(); // Before action logic
+                    cardMatrixPane.goRight();       // Main action logic
+                    System.out.println(11111);
+                    testkey[0] = 0;
+                    cardMatrixPane.afterAction(testkey); // After action logic
+                }
+                //System.out.println("testkey[0] = " + testkey[0]);
+            }
 
 
         });

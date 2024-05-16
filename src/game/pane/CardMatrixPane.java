@@ -2,9 +2,11 @@ package edu.sustech.game.pane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import edu.sustech.game.app.Game;
 import edu.sustech.game.config.CardColor;
+import edu.sustech.game.config.GameSaver;
 import javafx.animation.*;
 import javafx.scene.control.Alert;
 import javafx.scene.paint.*;
@@ -27,6 +29,12 @@ public class CardMatrixPane extends StackPane {
 	private CardPane[][] cps;//卡片矩阵
 	private long score=0;//分数,初始为0
 
+
+	private Game game;
+	private GameSaver gs;
+
+
+
 	private boolean keyProcessed = false;//键是否已经处理
 	private int[] mcQuantities=new int[15];//合并过的卡片数字数量,包括4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536
 	
@@ -35,17 +43,67 @@ public class CardMatrixPane extends StackPane {
 		this(4,4,game);//默认4*4
 	}
 
+	public CardMatrixPane(Game game, boolean newGame) {
+		mCallbacks=(GameCallbacks)game;
+		this.game = game;
+		if (newGame) {
+			this.cols=4;
+			this.rows=4;
 
+			init();
+		}else {
+			try {
+				gs = new GameSaver(game.getUsername());
+				Map<String, Object> map = gs.getCardPane();
+				if (map != null && map.get("cols") != null &&  map.get("rows") != null
+						&& map.get("cardPane") != null) {
+					this.cols = (int)map.get("cols");
+					this.rows = (int) map.get("rows");
+					cps = (CardPane[][])map.get("cardPane");
+				}
+
+				Map<String, Object> sc = gs.getScoreAndQuantities();
+				if (sc != null) {
+					score = ((Long)sc.get("score")).longValue();
+					mcQuantities = (int[])sc.get("quantities");
+				}
+
+				resumeGridPane();
+			}catch(Exception ex) {
+				ex.printStackTrace();
+				//异常时新开游戏
+				init();
+			}
+
+		}
+
+		getChildren().add(gridPane);
+	}
 	
 	public CardMatrixPane(int cols, int rows, Game game) {//application供回调方法使用
 		mCallbacks=(GameCallbacks)game;
 		this.cols=cols;
 		this.rows=rows;
+		this.game = game;
 //		this.setBackground(new Background(new BackgroundFill(Color.BLUE,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
 		init();
 		getChildren().add(gridPane);
 	}
-	public CardMatrixPane(){};
+
+	/**
+	 * 获取卡片矩阵
+	 * @return
+	 */
+	public CardPane[][] getCardPane() {
+		return cps;
+	}
+
+	/**
+	 * 获取卡片矩阵容器
+	 */
+	public GridPane getGridPane() {
+		return gridPane;
+	}
 	
 	/**获取分数*/
 	public long getScore() {
@@ -81,6 +139,28 @@ public class CardMatrixPane extends StackPane {
 				CardPane card=new CardPane(0);
 				gridPane.add(card, i, j);
 				cps[i][j]=card;
+			}
+		}
+	}
+
+	private void resumeGridPane() {
+
+		gridPane=new GridPane();
+//     gridPane.setBackground(new Background(new BackgroundFill(Color.YELLOW,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
+//     gridPane.setGridLinesVisible(true);//单元格边框可见,测试用
+
+		//对this尺寸监听
+		widthProperty().addListener(ov->setGridSizeAndCardFont());//宽度变化,更新边长和字号
+		heightProperty().addListener(ov->setGridSizeAndCardFont());//高度变化,更新边长和字号
+		//单元格间隙
+		gridPane.setHgap(20);
+		gridPane.setVgap(20);
+		//绘制每个单元格
+
+		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+			for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+				//CardPane card=new CardPane(0);
+				gridPane.add(cps[i][j], i, j);
 			}
 		}
 	}
@@ -173,17 +253,52 @@ public class CardMatrixPane extends StackPane {
 		});
 	}
 
+	public void afterAction(int[] testkey) {
+		CardPane maxCard=getMaxCard();//最大卡片
+		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+		System.out.println("重绘所有卡片");
+
+		// 创建一个暂停0.07秒的动画
+		//PauseTransition pause = new PauseTransition(Duration.seconds(1));
+
+        // 设置动画结束后的操作
+		//pause.setOnFinished(event -> {
+			//暂停结束后执行的代码
+			System.out.println("随机生成数字");
+			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+
+			if(isFull) {//矩阵已满,可能已经游戏结束
+				boolean testOpe=false;//是否还能进行横向或竖向操作
+				testOpe|=testUp();//还能进行竖向操作
+				testOpe|=testLeft();//还能进行横向操作
+				if(!testOpe) {//游戏结束
+					Alert alert=new Alert(Alert.AlertType.INFORMATION);
+					alert.setTitle(alert.getAlertType().toString());
+					alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
+					alert.show();
+				}
+			}
+			testkey[0] = 1;
+	//	});
+
+// 开始动画
+		//pause.play();
+
+
+
+	}
+
 	public void afterAction() {
 		CardPane maxCard=getMaxCard();//最大卡片
 		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
 		System.out.println("重绘所有卡片");
 
-		// 创建一个暂停0.1秒的动画
+		// 创建一个暂停0.07秒的动画
 		PauseTransition pause = new PauseTransition(Duration.seconds(0.07));
 
-// 设置动画结束后的操作
+		// 设置动画结束后的操作
 		pause.setOnFinished(event -> {
-			// 在这里添加你希望在暂停结束后执行的代码
+			//暂停结束后执行的代码
 			System.out.println("随机生成数字");
 			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
@@ -455,7 +570,7 @@ public class CardMatrixPane extends StackPane {
 		copyCard.setTranslateY(card.getLayoutY());
 
 		// 创建平移动画
-		TranslateTransition tt = new TranslateTransition(Duration.seconds(0.07), copyCard);
+		TranslateTransition tt = new TranslateTransition(Duration.seconds(0.5), copyCard);
 		tt.setByX(deltaX);
 		tt.setByY(deltaY);
 		tt.setOnFinished(event -> {

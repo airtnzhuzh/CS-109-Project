@@ -43,19 +43,12 @@ public class Login extends Application{
         Button login = new Button("登录");
         Button clear = new Button("清除");
         Button register = new Button("注册");
-        Button guest = new Button("游客模式");
-
-        guest.setMinSize(200, 35);//调整guest按钮尺寸
-
-        guest.setFont(Font.font(15)); //调整guest内部字的大小
-
-
-
+        Button guest = new Button("游客");
 
         GridPane gr=new GridPane();
         gr.setStyle("-fx-background-color: #FFF0F5");
 
-        gr.add(guest,1,0);
+        gr.add(guest,0,0);
         gr.add(l_name,0,1);
         gr.add(t_name,1,1);
         gr.add(l_password,0,2);
@@ -85,28 +78,6 @@ public class Login extends Application{
                 p_password.setText("");
         });
 
-        login.setOnAction(event -> {
-            String name = t_name.getText();
-            String password = p_password.getText();
-            try {
-                if (UserAuth.login(name, password)){
-                    primaryStage.close();
-                    new Game(this).startGame();
-                    Success success = new Success("登录");
-                }else{
-                    primaryStage.setTitle("账号或者密码错误");
-                    FadeTransition fade = new FadeTransition();
-                    fade.setDuration(Duration.seconds(0.1));
-                    fade.setNode(gr);
-                    fade.setFromValue(0);
-                    fade.setToValue(1);
-                    fade.play();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        });
 
         login.setOnAction(event -> {
             String name = t_name.getText();
@@ -114,7 +85,7 @@ public class Login extends Application{
             try {
                 if (UserAuth.login(name, password)){
                     primaryStage.close();
-                    new Game(this).startGame();
+                    new Game(this,name).startGame();
                     Success success = new Success("登录");
                 }else{
                     primaryStage.setTitle("账号或者密码错误");
@@ -137,8 +108,7 @@ public class Login extends Application{
 
         guest.setOnAction(event -> {
             primaryStage.close();
-            new Game(this).startGame();
-            Success success = new Success("登录");
+            new Game(this,null).startGame();
         });
     }
 }
@@ -208,7 +178,7 @@ class Signup{
             String password1 = p_newpassword1.getText();
             String password2 = p_newpassword2.getText();
             try {
-                if (UserAuth.exist(name) == false) {
+                if (!UserAuth.exist(name)) {
                     if (password1.equals(password2) && UserAuth.signup(name, password1) == true) {
                         primaryStage.show();
                         Success success = new Success("注册");
