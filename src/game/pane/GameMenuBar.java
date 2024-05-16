@@ -29,6 +29,7 @@ public class GameMenuBar extends MenuBar {
 		MenuItem saveMenuItem=new MenuItem("保存");//保存
 		saveMenuItem.setOnAction(e->mCallbacks.save());
 		MenuItem exitMenuItem=new MenuItem("退出");//退出
+		exitMenuItem.setOnAction(e->mCallbacks.save());
 		exitMenuItem.setOnAction(e->Platform.exit());
 		gameMenu.getItems().addAll(restartMenuItem,saveMenuItem,exitMenuItem);
 		
