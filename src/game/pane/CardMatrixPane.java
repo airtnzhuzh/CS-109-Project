@@ -294,7 +294,7 @@ public class CardMatrixPane extends StackPane {
 
 		// 创建一个暂停0.07秒的动画
 		PauseTransition pause = new PauseTransition(Duration.seconds(0.07));
-		final boolean[] testOpe = {false};//是否还能进行横向或竖向操作
+		 boolean[] testOpe = {false};//是否还能进行横向或竖向操作
 
 		// 设置动画结束后的操作
 		pause.setOnFinished(event -> {
@@ -312,16 +312,25 @@ public class CardMatrixPane extends StackPane {
 					alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
 					alert.show();
 				}
+
 			}
+
+
 
 		});
 
+
 // 开始动画
 		pause.play();
-
-
-        return testOpe[0];
+		return testOpe[0];
     }
+	public boolean isNotGameOver() {
+		boolean testOpe=false;//是否还能进行横向或竖向操作
+		testOpe|=testUp();//还能进行竖向操作
+		testOpe|=testLeft();//还能进行横向操作
+		System.out.println("testOpe:"+testOpe);
+		return testOpe;
+	}
 
 
 	

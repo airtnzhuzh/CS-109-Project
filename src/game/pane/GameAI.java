@@ -16,14 +16,20 @@ public class GameAI extends Pane {
     private VBox menu;
     private int time;
     private boolean aiProcessed = false;//键是否已经处理
+    private Button AllStepsButton;
+    private Button OneStepButton;
+
+    // instance variable
+    private long previousTimestamp ;
+    private long nanoSecsPerFrame = Math.round(1.0/10 * 1e9);
 
     public GameAI(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
         int time = 1;
 
         //创建按钮
-        Button OneStepButton = new Button("AI推荐");
-        Button AllStepsButton = new Button("电脑托管");
+        OneStepButton = new Button("AI推荐");
+        AllStepsButton = new Button("电脑托管");
 
         //调整尺寸
         OneStepButton.setMinSize(80, 80);
@@ -44,60 +50,77 @@ public class GameAI extends Pane {
 
 
         AllStepsButton.setOnAction(e -> {
-
             AllStepsButton.setStyle("-fx-background-color: #32c9a1");
             AllStepsButton.setText("STOP");
-            cardMatrixPane.requestFocus();
-            AnimationTimer timer2 = new AnimationTimer() {
-                @Override
-                public void handle(long now) {
-                    if (aiProcessed) {
-                        return;
-                    }
-                    aiProcessed = true;
-                    cardMatrixPane.beforeAction(); // Before action logic
-                    cardMatrixPane.goUp();       // Main action logic
-                    cardMatrixPane.afterAction(); // After action logic
-                    if (cardMatrixPane.afterAction()) {
-                        aiProcessed = false;
-                        AllStepsButton.setStyle("-fx-background-color: #ffffff");
-                        AllStepsButton.setText("电脑托管");
-                        cardMatrixPane.requestFocus();
-                        return;
-                    }
-                    aiProcessed = false;
-
-                }
-            };
-            timer2.start();
-            //再次按键后停止且初始化，
-            AllStepsButton.setOnAction(event -> {
-                timer2.stop();
-                AllStepsButton.setStyle("-fx-background-color: #ffffff");
-                AllStepsButton.setText("电脑托管");
-            });
-            cardMatrixPane.requestFocus();
-
-
+            AllStepsButton();
         });
-
-
     }
 
 
-//        // 通过定时器实现自动游戏
-//        new Thread(() -> {
-//            while (true) {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
+
+
+    private void AllStepsButton() {
+
+        cardMatrixPane.requestFocus();
+        AnimationTimer timer2 = new AnimationTimer() {
+
+            //设置刷新频率
+
+
+            @Override
+            public void handle(long timeStamp) {
+                if (timeStamp - previousTimestamp < nanoSecsPerFrame)
+                {
+                    return;
+                }
+                previousTimestamp = timeStamp;
+                if (aiProcessed) {
+                    return;
+                }
+//                if(!cardMatrixPane.isNotGameOver()){
+//                    AllStepsButton.setStyle("-fx-background-color: #ffffff");
+//                    AllStepsButton.setText("电脑托管");
+//                    cardMatrixPane.requestFocus();
+//                    cardMatrixPane.afterAction();
+//                    this.stop();
 //                }
-//                cardMatrixPane.beforeAction();
-//                cardMatrixPane.goUp();
-//                cardMatrixPane.afterAction();
-//            }
-//        }).start();
+                aiProcessed = true;
+                cardMatrixPane.beforeAction(); // Before action logic
+                cardMatrixPane.goUp();       // Main action logic
+                if(!cardMatrixPane.isNotGameOver()) {// After action logic
+                    AllStepsButton.setStyle("-fx-background-color: #ffffff");
+                    AllStepsButton.setText("电脑托管");
+                    cardMatrixPane.afterAction();
+                    this.stop();
+                }
+                else {
+                    cardMatrixPane.afterAction();
+                }
+                aiProcessed = false;
+
+            }
+
+        };
+
+        timer2.start();
+        if (!cardMatrixPane.isNotGameOver()) {
+            timer2.stop();
+        }
+
+        //再次按键后停止且初始化，
+        AllStepsButton.setOnAction(event -> {
+            timer2.stop();
+            //event绑定回去
+            AllStepsButton.setStyle("-fx-background-color: #ffffff");
+            AllStepsButton.setText("电脑托管");
+            cardMatrixPane.requestFocus();
+            AllStepsButton.setOnAction(e -> {
+                AllStepsButton.setStyle("-fx-background-color: #32c9a1");
+                AllStepsButton.setText("STOP");
+                AllStepsButton();
+            });
+        });
+    }
 
     private void AIcontrol() {
 
