@@ -1,5 +1,6 @@
 package edu.sustech.game.pane;
 
+import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -10,7 +11,7 @@ import javafx.util.Duration;
 
 import static java.lang.Thread.sleep;
 
-public class GameAI  extends Pane {
+public class GameAI extends Pane {
     private CardMatrixPane cardMatrixPane;
     private VBox menu;
     private int time;
@@ -41,27 +42,47 @@ public class GameAI  extends Pane {
             cardMatrixPane.afterAction(); // After action logic
         });
 
+
         AllStepsButton.setOnAction(e -> {
+
+            AllStepsButton.setStyle("-fx-background-color: #32c9a1");
+            AllStepsButton.setText("STOP");
             cardMatrixPane.requestFocus();
-            int[] testkey = new int[1];
-            testkey[0] = 1;
-            while(true) {
-                if(testkey[0]==1) {
+            AnimationTimer timer2 = new AnimationTimer() {
+                @Override
+                public void handle(long now) {
+                    if (aiProcessed) {
+                        return;
+                    }
+                    aiProcessed = true;
                     cardMatrixPane.beforeAction(); // Before action logic
-                    cardMatrixPane.goRight();       // Main action logic
-                    System.out.println(11111);
-                    testkey[0] = 0;
-                    cardMatrixPane.afterAction(testkey); // After action logic
+                    cardMatrixPane.goUp();       // Main action logic
+                    cardMatrixPane.afterAction(); // After action logic
+                    if (cardMatrixPane.afterAction()) {
+                        aiProcessed = false;
+                        AllStepsButton.setStyle("-fx-background-color: #ffffff");
+                        AllStepsButton.setText("电脑托管");
+                        cardMatrixPane.requestFocus();
+                        return;
+                    }
+                    aiProcessed = false;
+
                 }
-                //System.out.println("testkey[0] = " + testkey[0]);
-            }
+            };
+            timer2.start();
+            //再次按键后停止且初始化，
+            AllStepsButton.setOnAction(event -> {
+                timer2.stop();
+                AllStepsButton.setStyle("-fx-background-color: #ffffff");
+                AllStepsButton.setText("电脑托管");
+            });
+            cardMatrixPane.requestFocus();
 
 
         });
 
 
     }
-
 
 
 //        // 通过定时器实现自动游戏
@@ -78,7 +99,7 @@ public class GameAI  extends Pane {
 //            }
 //        }).start();
 
-    private void AIcontrol(){
+    private void AIcontrol() {
 
     }
 

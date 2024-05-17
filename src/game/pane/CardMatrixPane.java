@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.sustech.game.app.Game;
-import edu.sustech.game.config.CardColor;
 import edu.sustech.game.config.GameSaver;
 import javafx.animation.*;
 import javafx.scene.control.Alert;
-import javafx.scene.paint.*;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
@@ -289,13 +287,14 @@ public class CardMatrixPane extends StackPane {
 
 	}
 
-	public void afterAction() {
+	public boolean afterAction() {
 		CardPane maxCard=getMaxCard();//最大卡片
 		redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
 		System.out.println("重绘所有卡片");
 
 		// 创建一个暂停0.07秒的动画
 		PauseTransition pause = new PauseTransition(Duration.seconds(0.07));
+		final boolean[] testOpe = {false};//是否还能进行横向或竖向操作
 
 		// 设置动画结束后的操作
 		pause.setOnFinished(event -> {
@@ -304,23 +303,25 @@ public class CardMatrixPane extends StackPane {
 			boolean isFull=!createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
 			if(isFull) {//矩阵已满,可能已经游戏结束
-				boolean testOpe=false;//是否还能进行横向或竖向操作
-				testOpe|=testUp();//还能进行竖向操作
-				testOpe|=testLeft();//还能进行横向操作
-				if(!testOpe) {//游戏结束
+
+				testOpe[0] |=testUp();//还能进行竖向操作
+				testOpe[0] |=testLeft();//还能进行横向操作
+				if(!testOpe[0]) {//游戏结束
 					Alert alert=new Alert(Alert.AlertType.INFORMATION);
 					alert.setTitle(alert.getAlertType().toString());
 					alert.setContentText("游戏结束,本次最大数字为"+maxCard.getNumber()+",可在菜单栏选择重新开始\n");
 					alert.show();
 				}
 			}
+
 		});
 
 // 开始动画
 		pause.play();
 
 
-	}
+        return testOpe[0];
+    }
 
 
 	

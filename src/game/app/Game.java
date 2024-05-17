@@ -39,10 +39,6 @@ public class Game implements GameCallbacks {
 		menuBar=new GameMenuBar(this);//创建菜单栏,并传入Application供调用
 		borderPane.setTop(menuBar);//顶部
 
-		//右上角增加GameAI
-		gameAI =new GameAI(cardMatrixPane);
-		borderPane.setLeft(gameAI.getLayout());
-		borderPane.setPadding(new Insets(5,5,5,5));
 
 
 		//Center2048卡片矩阵
@@ -53,6 +49,11 @@ public class Game implements GameCallbacks {
 		}
 		cardMatrixPane.setPadding(new Insets(5,5,5,5));//外边距
 		borderPane.setCenter(cardMatrixPane);//中心
+
+		//右上角增加GameAI
+		gameAI =new GameAI(cardMatrixPane);
+		borderPane.setLeft(gameAI.getLayout());
+		borderPane.setPadding(new Insets(5,5,5,5));
 
 		//Right方向按钮
 		directionMenu = new DirectionMenu(cardMatrixPane);
