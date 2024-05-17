@@ -332,8 +332,12 @@ public class CardMatrixPane extends StackPane {
 		return testOpe;
 	}
 
+/*
+ * 以下是四个带动画的操作
+ *
+ *
+ ************/
 
-	
 	/**向上操作*/
 	public void goUp() {
 		System.out.println("goUp01");
@@ -354,34 +358,6 @@ public class CardMatrixPane extends StackPane {
 				}
 			}
 		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
-	}
-	
-	/**测试是否能向上操作*/
-	private boolean testUp() {
-		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
-			for(int j=1;j<rows;j++) {//从第二行起向下,遍历卡片矩阵的行
-				CardPane card=cps[i][j];
-				CardPane preCard=cps[i][j-1];//前一个卡片
-				if(card.canMergeOrMove(preCard)) {
-					return true;//能
-				}
-			}
-		}
-		return false;//不能
-	}
-
-	/**测试是否能向下操作*/
-	private boolean testDown() {
-		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
-			for(int j=rows-2;j>=0;j--) {//从倒数第二行起向上,遍历卡片矩阵的行
-				CardPane card=cps[i][j];
-				CardPane preCard=cps[i][j+1];//前一个卡片
-				if(card.canMergeOrMove(preCard)) {
-					return true;//能
-				}
-			}
-		}
-		return false;//不能
 	}
 
 	/**向下操作*/
@@ -425,7 +401,145 @@ public class CardMatrixPane extends StackPane {
 			}
 		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
 	}
-	
+
+	/**向右操作*/
+	public void goRight() {
+		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
+		do {
+			mergeOrMoveExist=false;//初始为false
+			for(int i=cols-2;i>=0;i--) {//从倒数第二列起向左,遍历卡片矩阵的列
+				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+					CardPane card=cps[i][j];
+					CardPane preCard=cps[i+1][j];//前一个卡片
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
+						animateMove(card, i, j, i + 1, j);
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
+					}
+					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
+				}
+			}
+		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
+	}
+
+	/*
+	 * 以下是四个不带动画的操作
+	 *
+	 *
+	 ************/
+
+	/**向上操作*/
+	public void goUp2() {
+		System.out.println("goUp01");
+		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
+		do {
+			mergeOrMoveExist=false;//初始为false
+			for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+				for(int j=1;j<rows;j++) {//从第二行起向下,遍历卡片矩阵的行
+					CardPane card=cps[i][j];
+					CardPane preCard=cps[i][j-1];//前一个卡片
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
+					}
+					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
+				}
+			}
+		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
+	}
+
+	/**向下操作*/
+	public void goDown2() {
+		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
+		do {
+			mergeOrMoveExist=false;//初始为false
+			for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+				for(int j=rows-2;j>=0;j--) {//从倒数第二行起向上,遍历卡片矩阵的行
+					CardPane card=cps[i][j];
+					CardPane preCard=cps[i][j+1];//前一个卡片
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
+					}
+					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
+				}
+			}
+		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
+	}
+
+	/**向左操作*/
+	public void goLeft2() {
+		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
+		do {
+			mergeOrMoveExist=false;//初始为false
+			for(int i=1;i<cols;i++) {//从第二列起向右,遍历卡片矩阵的列
+				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+					CardPane card=cps[i][j];
+					CardPane preCard=cps[i-1][j];//前一个卡片
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
+					}
+					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
+				}
+			}
+		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
+	}
+
+	/**向右操作*/
+	public void goRight2() {
+		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
+		do {
+			mergeOrMoveExist=false;//初始为false
+			for(int i=cols-2;i>=0;i--) {//从倒数第二列起向左,遍历卡片矩阵的列
+				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+					CardPane card=cps[i][j];
+					CardPane preCard=cps[i+1][j];//前一个卡片
+					boolean isChanged=false;
+					if (card.canMergeOrMove(preCard)) {
+						isChanged = true;
+						card.tryMergeOrMoveInto(preCard);
+					}
+					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
+				}
+			}
+		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
+	}
+
+
+
+	/**测试是否能向上操作*/
+	private boolean testUp() {
+		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+			for(int j=1;j<rows;j++) {//从第二行起向下,遍历卡片矩阵的行
+				CardPane card=cps[i][j];
+				CardPane preCard=cps[i][j-1];//前一个卡片
+				if(card.canMergeOrMove(preCard)) {
+					return true;//能
+				}
+			}
+		}
+		return false;//不能
+	}
+
+	/**测试是否能向下操作*/
+	private boolean testDown() {
+		for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+			for(int j=rows-2;j>=0;j--) {//从倒数第二行起向上,遍历卡片矩阵的行
+				CardPane card=cps[i][j];
+				CardPane preCard=cps[i][j+1];//前一个卡片
+				if(card.canMergeOrMove(preCard)) {
+					return true;//能
+				}
+			}
+		}
+		return false;//不能
+	}
+
 	/**测试是否能向左操作*/
 	private boolean testLeft() {
 		for(int i=1;i<cols;i++) {//从第二列起向右,遍历卡片矩阵的列
@@ -453,26 +567,7 @@ public class CardMatrixPane extends StackPane {
 		return false;//不能
 	}
 	
-	/**向右操作*/
-	public void goRight() {
-		boolean mergeOrMoveExist;//矩阵的这次操作的一次遍历中是否存在移动或合并
-		do {
-			mergeOrMoveExist=false;//初始为false
-			for(int i=cols-2;i>=0;i--) {//从倒数第二列起向左,遍历卡片矩阵的列
-				for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
-					CardPane card=cps[i][j];
-					CardPane preCard=cps[i+1][j];//前一个卡片
-					boolean isChanged=false;
-					if (card.canMergeOrMove(preCard)) {
-						animateMove(card, i, j, i + 1, j);
-						isChanged = true;
-						card.tryMergeOrMoveInto(preCard);
-					}
-					mergeOrMoveExist|=isChanged;//只要有一次移动或合并记录,就记存在为true
-				}
-			}
-		}while(mergeOrMoveExist);//如果存在移动或合并,就可能需要再次遍历,继续移动或合并
-	}
+
 	
 	/**重绘所有的卡片,并重设合并记录,并设置分数*/
 	private void redrawAllCardsAndResetIsMergeAndSetScore() {

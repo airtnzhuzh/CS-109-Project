@@ -1,6 +1,7 @@
 package edu.sustech.game.control;
 
 import edu.sustech.game.pane.CardMatrixPane;
+import edu.sustech.game.pane.CardPane;
 
 public class GameAI {
 
@@ -8,19 +9,12 @@ public class GameAI {
     private  final float mono2Weight = 1.0f;
     private final  float emptyWeight = 1.0f;
     private  final float maxWeight = 1.0f;
-    private CardMatrixPane cardMatrixPane;
+
     private int[][] cps;
 
 
-    public GameAI(CardMatrixPane cardMatrixPane){
-        this.cardMatrixPane = new CardMatrixPane(cardMatrixPane.getGame());
-        this.cardMatrixPane.setCps(cardMatrixPane.getCps());
-
-
-
-    }
-
     public value getBestMove(){
+        return value.LEFT;
 
     }
 
@@ -30,7 +24,9 @@ public class GameAI {
 
     }
 
-    private float smoothness(){
+
+
+    private float smoothness(CardMatrixPane cardMatrixPane){
         float smoothness = 0;
         for(int x = 0; x < 4; x++){
             for(int y = 0; y < 4; y++){
@@ -80,7 +76,7 @@ public class GameAI {
     }
 
 
-    private float monotonicity(){
+    private float monotonicity(CardMatrixPane cardMatrixPane){
         int[] totals = new int[4];
         for(int x = 0; x < 4; x++){
             int current = 0;
@@ -127,7 +123,7 @@ public class GameAI {
         return Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3]);
     }
 
-    private float emptyCells(){
+    private float emptyCells(CardMatrixPane cardMatrixPane){
         float emptyCells = 0;
         for(int x = 0; x < 4; x++){
             for(int y = 0; y < 4; y++){
@@ -139,7 +135,7 @@ public class GameAI {
         return emptyCells;
     }
 
-    private float maxValue(){
+    private float maxValue(CardMatrixPane cardMatrixPane){
         int max = 0;
         for(int x = 0; x < 4; x++){
             for(int y = 0; y < 4; y++){
@@ -154,40 +150,40 @@ public class GameAI {
         return max;
     }
 
-    private float evaluate(){
-        return smoothWeight * smoothness()
-                + mono2Weight * monotonicity()
-                + emptyWeight * emptyCells()
-                + maxWeight * (float)Math.log(maxValue()) ;
+    private float evaluate(CardMatrixPane cardMatrixPane){
+        return smoothWeight * smoothness(cardMatrixPane)
+                + mono2Weight * monotonicity(cardMatrixPane)
+                + emptyWeight * emptyCells(cardMatrixPane)
+                + maxWeight * (float)Math.log(maxValue(cardMatrixPane)) ;
     }
 
-    private float minmax(int depth, float alpha, float beta, value direction){
-        if(depth == 0){
-           return evaluate();
-        }
-        if(direction == value.UP){
-            cardMatrixPane.goUp();
-            minmax(depth - 1, alpha, beta, value.LEFT);
-            cardMatrixPane.goDown();
-            minmax(depth - 1, alpha, beta, value.RIGHT);
-        }else if(direction == value.DOWN){
-            cardMatrixPane.goDown();
-            minmax(depth - 1, alpha, beta, value.LEFT);
-            cardMatrixPane.goUp();
-            minmax(depth - 1, alpha, beta, value.RIGHT);
-        }else if(direction == value.LEFT){
-            cardMatrixPane.goLeft();
-            minmax(depth - 1, alpha, beta, value.UP);
-            cardMatrixPane.goRight();
-            minmax(depth - 1, alpha, beta, value.DOWN);
-        }else if(direction == value.RIGHT){
-            cardMatrixPane.goRight();
-            minmax(depth - 1, alpha, beta, value.UP);
-            cardMatrixPane.goLeft();
-            minmax(depth - 1, alpha, beta, value.DOWN);
-        }
-        return 0;
-    }
+//    private float minmax(CardMatrixPane cardMatrixPane,int depth, float alpha, float beta, value direction){
+//        if(depth == 0){
+//           return evaluate(cardMatrixPane);
+//        }
+//        if(direction == value.UP){
+//            cardMatrixPane.goUp();
+//            minmax(cardMatrixPane,depth - 1, alpha, beta, value.LEFT);
+//            cardMatrixPane.goDown();
+//            minmax(cardMatrixPane,depth - 1, alpha, beta, value.RIGHT);
+//        }else if(direction == value.DOWN){
+//            cardMatrixPane.goDown();
+//            minmax(depth - 1, alpha, beta, value.LEFT);
+//            cardMatrixPane.goUp();
+//            minmax(depth - 1, alpha, beta, value.RIGHT);
+//        }else if(direction == value.LEFT){
+//            cardMatrixPane.goLeft();
+//            minmax(depth - 1, alpha, beta, value.UP);
+//            cardMatrixPane.goRight();
+//            minmax(depth - 1, alpha, beta, value.DOWN);
+//        }else if(direction == value.RIGHT){
+//            cardMatrixPane.goRight();
+//            minmax(depth - 1, alpha, beta, value.UP);
+//            cardMatrixPane.goLeft();
+//            minmax(depth - 1, alpha, beta, value.DOWN);
+//        }
+//        return 0;
+//    }
 
 
 
@@ -195,21 +191,6 @@ public class GameAI {
 
 
 
-
-
-
-    public void startGame(){
-        value bestMove = getBestMove();
-        if(bestMove == value.UP){
-            cardMatrixPane.goUp();
-        }else if(bestMove == value.DOWN){
-            cardMatrixPane.goDown();
-        }else if(bestMove == value.LEFT){
-            cardMatrixPane.goLeft();
-        }else if(bestMove == value.RIGHT){
-            cardMatrixPane.goRight();
-        }
-    }
 
 
 
