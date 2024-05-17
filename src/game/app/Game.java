@@ -1,6 +1,7 @@
 package edu.sustech.game.app;
 
 import edu.sustech.game.config.GameSaver;
+import edu.sustech.game.pane.GameAIMenu;
 import edu.sustech.game.pane.*;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -24,7 +25,7 @@ public class Game implements GameCallbacks {
 	private CardMatrixPane cardMatrixPane;
 	private String username;
 
-	private GameAI gameAI;
+	private GameAIMenu gameAIMenu;
 
 	private DirectionMenu directionMenu;
 	
@@ -51,8 +52,8 @@ public class Game implements GameCallbacks {
 		borderPane.setCenter(cardMatrixPane);//中心
 
 		//右上角增加GameAI
-		gameAI =new GameAI(cardMatrixPane);
-		borderPane.setLeft(gameAI.getLayout());
+		gameAIMenu =new GameAIMenu(cardMatrixPane);
+		borderPane.setLeft(gameAIMenu.getLayout());
 		borderPane.setPadding(new Insets(5,5,5,5));
 
 		//Right方向按钮

@@ -1,17 +1,13 @@
 package edu.sustech.game.pane;
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.PauseTransition;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import static java.lang.Thread.sleep;
 
-public class GameAI extends Pane {
+public class GameAIMenu extends Pane {
     private CardMatrixPane cardMatrixPane;
     private VBox menu;
     private int time;
@@ -23,7 +19,7 @@ public class GameAI extends Pane {
     private long previousTimestamp ;
     private long nanoSecsPerFrame = Math.round(1.0/10 * 1e9);
 
-    public GameAI(CardMatrixPane cardMatrixPane) {
+    public GameAIMenu(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
         int time = 1;
 
@@ -123,6 +119,8 @@ public class GameAI extends Pane {
     }
 
     private void AIcontrol() {
+
+
 
     }
 
