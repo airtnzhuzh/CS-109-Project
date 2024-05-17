@@ -51,7 +51,7 @@ public class Game implements GameCallbacks {
 		cardMatrixPane.setPadding(new Insets(5,5,5,5));//外边距
 		borderPane.setCenter(cardMatrixPane);//中心
 
-		//右上角增加GameAI
+		//右上角增加GameAIMenu
 		gameAIMenu =new GameAIMenu(cardMatrixPane);
 		borderPane.setLeft(gameAIMenu.getLayout());
 		borderPane.setPadding(new Insets(5,5,5,5));

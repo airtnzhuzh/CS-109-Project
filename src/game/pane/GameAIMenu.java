@@ -118,11 +118,6 @@ public class GameAIMenu extends Pane {
         });
     }
 
-    private void AIcontrol() {
-
-
-
-    }
 
     public VBox getLayout() {
         return menu;

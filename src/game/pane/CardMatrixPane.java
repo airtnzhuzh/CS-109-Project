@@ -625,5 +625,19 @@ public class CardMatrixPane extends StackPane {
 		});
 		tt.play();
 	}
+	public CardPane[][] getCps() {
+		return cps;
+	}
+	public void setCps(CardPane[][] cps) {
+		this.cps = cps;
+	}
+
+
+
+	public Game getGame() {
+		return game;
+	}
+
+
 }
 
