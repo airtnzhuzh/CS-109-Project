@@ -3,23 +3,19 @@ package edu.sustech.game.control;
 import edu.sustech.game.pane.CardMatrixPane;
 import edu.sustech.game.pane.CardPane;
 
+import java.util.Arrays;
+
 public class GameAI {
 
-    private final float smoothWeight = 1.0f;
-    private  final float mono2Weight = 1.0f;
-    private final  float emptyWeight = 1.0f;
-    private  final float maxWeight = 1.0f;
+    private final float smoothWeight = 0.05f;
+    private  final float monoWeight = 1.0f;
+    private final  float emptyWeight = 3.5f;
+    private  final float maxWeight = 2.0f;
 
     private int[][] cps;
 
-
-    public value getBestMove(){
-        return value.LEFT;
-
-    }
-
     public enum value{
-        UP, DOWN, LEFT, RIGHT
+        UP, DOWN, LEFT, RIGHT,NULL
 
 
     }
@@ -151,39 +147,132 @@ public class GameAI {
     }
 
     private float evaluate(CardMatrixPane cardMatrixPane){
-        return smoothWeight * smoothness(cardMatrixPane)
-                + mono2Weight * monotonicity(cardMatrixPane)
-                + emptyWeight * emptyCells(cardMatrixPane)
-                + maxWeight * (float)Math.log(maxValue(cardMatrixPane)) ;
+        if(cardMatrixPane.afterAction2()){
+            return -0.1f;
+        }
+        else {
+            return smoothWeight * smoothness(cardMatrixPane)
+                    + monoWeight * monotonicity(cardMatrixPane)
+                    + emptyWeight * emptyCells(cardMatrixPane)
+                    + maxWeight * (float)Math.log(maxValue(cardMatrixPane)) ;
+        }
     }
 
-//    private float minmax(CardMatrixPane cardMatrixPane,int depth, float alpha, float beta, value direction){
-//        if(depth == 0){
-//           return evaluate(cardMatrixPane);
-//        }
-//        if(direction == value.UP){
-//            cardMatrixPane.goUp();
-//            minmax(cardMatrixPane,depth - 1, alpha, beta, value.LEFT);
-//            cardMatrixPane.goDown();
-//            minmax(cardMatrixPane,depth - 1, alpha, beta, value.RIGHT);
-//        }else if(direction == value.DOWN){
-//            cardMatrixPane.goDown();
-//            minmax(depth - 1, alpha, beta, value.LEFT);
-//            cardMatrixPane.goUp();
-//            minmax(depth - 1, alpha, beta, value.RIGHT);
-//        }else if(direction == value.LEFT){
-//            cardMatrixPane.goLeft();
-//            minmax(depth - 1, alpha, beta, value.UP);
-//            cardMatrixPane.goRight();
-//            minmax(depth - 1, alpha, beta, value.DOWN);
-//        }else if(direction == value.RIGHT){
-//            cardMatrixPane.goRight();
-//            minmax(depth - 1, alpha, beta, value.UP);
-//            cardMatrixPane.goLeft();
-//            minmax(depth - 1, alpha, beta, value.DOWN);
-//        }
-//        return 0;
-//    }
+    private void minmax(CardMatrixPane cardMatrixPaneOrigin,int depth, float[] max , value direction){
+        CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
+        if(depth == 0){
+            max[0] = Math.max(max[0], evaluate(cardMatrixPane));
+            return;
+        }
+        if(direction == value.UP){
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goUp2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1,max, value.LEFT);
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goDown2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1,max, value.RIGHT);
+        }else if(direction == value.DOWN){
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goDown2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1, max, value.LEFT);
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goUp2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1, max, value.RIGHT);
+        }else if(direction == value.LEFT){
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goLeft2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1,max, value.UP);
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goRight2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
+        }else if(direction == value.RIGHT){
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goRight2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1, max, value.UP);
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goLeft2();
+            cardMatrixPane.afterAction2();
+            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
+        }
+    }
+
+    public value findBestMove(CardMatrixPane cardMatrixPane) {
+        float[] maxUP = new float[1];
+        maxUP[0] = 0;
+        float[] maxDOWN = new float[1];
+        maxDOWN[0] = 0;
+        float[] maxLEFT = new float[1];
+        maxLEFT[0] = 0;
+        float[] maxRIGHT = new float[1];
+        maxRIGHT[0] = 0;
+        minmax(cardMatrixPane, 7, maxUP, value.UP);
+        minmax(cardMatrixPane, 7, maxDOWN, value.DOWN);
+        minmax(cardMatrixPane, 7, maxLEFT, value.LEFT);
+        minmax(cardMatrixPane, 7, maxRIGHT, value.RIGHT);
+        if (maxUP[0] > maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]) {
+            return value.UP;
+        }
+        if (maxDOWN[0] > maxUP[0] && maxDOWN[0] > maxLEFT[0] && maxDOWN[0] >maxRIGHT[0]) {
+            return value.DOWN;
+        }
+        if (maxLEFT[0] > maxUP[0] && maxLEFT[0] > maxDOWN[0] && maxLEFT[0] > maxRIGHT[0]) {
+            return value.LEFT;
+        }
+        if (maxRIGHT[0] > maxUP[0] && maxRIGHT[0] > maxDOWN[0] && maxRIGHT[0] > maxLEFT[0]) {
+            return value.RIGHT;
+        }
+        if(maxUP[0] == maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]){
+            //二分之一概率随机
+            int random = (int)(Math.random() * 2);
+            if(random == 0) return value.UP;
+            if(random == 1) return value.DOWN;
+        }
+        if(maxUP[0] == maxLEFT[0] && maxUP[0] > maxDOWN[0] && maxUP[0] > maxRIGHT[0]){
+            //二分之一概率随机
+            int random = (int)(Math.random() * 2);
+            if(random == 0) return value.UP;
+            if(random == 1) return value.LEFT;
+        }
+        if(maxUP[0] == 0 && maxDOWN[0] == 0 && maxLEFT[0] == 0 && maxRIGHT[0] == 0){
+            //四分之一概率随机
+            int random = (int)(Math.random() * 4);
+            if(random == 0) return value.UP;
+            if(random == 1) return value.DOWN;
+            if(random == 2) return value.LEFT;
+            if(random == 3) return value.RIGHT;
+        }
+        return value.NULL;
+
+
+    }
+
+    public void move(CardMatrixPane cardMatrixPane) {
+        value bestMove = findBestMove(cardMatrixPane);
+        if (bestMove == value.UP) {
+            cardMatrixPane.goUp();
+        } else if (bestMove == value.DOWN) {
+            cardMatrixPane.goDown();
+        } else if (bestMove == value.LEFT) {
+            cardMatrixPane.goLeft();
+        } else if(bestMove == value.RIGHT) {
+            cardMatrixPane.goRight();
+        }
+
+    }
+
+    public void movetest(CardMatrixPane cardMatrixPane) {
+        findBestMove(cardMatrixPane);
+        cardMatrixPane.goUp();
+    }
+
+
 
 
 

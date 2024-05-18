@@ -1,11 +1,12 @@
 package edu.sustech.game.pane;
 
+import edu.sustech.game.app.Game;
+import edu.sustech.game.control.GameAI;
 import javafx.animation.AnimationTimer;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import static java.lang.Thread.sleep;
 
 public class GameAIMenu extends Pane {
     private CardMatrixPane cardMatrixPane;
@@ -14,13 +15,16 @@ public class GameAIMenu extends Pane {
     private boolean aiProcessed = false;//键是否已经处理
     private Button AllStepsButton;
     private Button OneStepButton;
+    private GameAI gameAI;
+
 
     // instance variable
     private long previousTimestamp ;
-    private long nanoSecsPerFrame = Math.round(1.0/10 * 1e9);
+    private long nanoSecsPerFrame = Math.round(1.0/5 * 1e9);
 
     public GameAIMenu(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
+        gameAI = new GameAI();
         int time = 1;
 
         //创建按钮
@@ -40,7 +44,7 @@ public class GameAIMenu extends Pane {
         OneStepButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goUp();       // Main action logic
+            gameAI.move(cardMatrixPane);       // Main action logic
             cardMatrixPane.afterAction(); // After action logic
         });
 
@@ -73,25 +77,16 @@ public class GameAIMenu extends Pane {
                 if (aiProcessed) {
                     return;
                 }
-//                if(!cardMatrixPane.isNotGameOver()){
-//                    AllStepsButton.setStyle("-fx-background-color: #ffffff");
-//                    AllStepsButton.setText("电脑托管");
-//                    cardMatrixPane.requestFocus();
-//                    cardMatrixPane.afterAction();
-//                    this.stop();
-//                }
                 aiProcessed = true;
                 cardMatrixPane.beforeAction(); // Before action logic
-                cardMatrixPane.goUp();       // Main action logic
-                if(!cardMatrixPane.isNotGameOver()) {// After action logic
+                gameAI.move(cardMatrixPane);       // Main action logic
+                if(cardMatrixPane.afterAction()) {// After action logic
                     AllStepsButton.setStyle("-fx-background-color: #ffffff");
                     AllStepsButton.setText("电脑托管");
-                    cardMatrixPane.afterAction();
                     this.stop();
+
                 }
-                else {
-                    cardMatrixPane.afterAction();
-                }
+
                 aiProcessed = false;
 
             }
@@ -99,9 +94,7 @@ public class GameAIMenu extends Pane {
         };
 
         timer2.start();
-        if (!cardMatrixPane.isNotGameOver()) {
-            timer2.stop();
-        }
+
 
         //再次按键后停止且初始化，
         AllStepsButton.setOnAction(event -> {
