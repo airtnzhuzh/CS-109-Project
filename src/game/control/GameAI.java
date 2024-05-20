@@ -7,9 +7,9 @@ import java.util.Arrays;
 
 public class GameAI {
 
-    private final float smoothWeight = 0.05f;
+    private final float smoothWeight = 0.1f;
     private  final float monoWeight = 1.0f;
-    private final  float emptyWeight = 3.5f;
+    private final  float emptyWeight = 3.0f;
     private  final float maxWeight = 2.0f;
 
     private int[][] cps;
@@ -256,13 +256,13 @@ public class GameAI {
     public void move(CardMatrixPane cardMatrixPane) {
         value bestMove = findBestMove(cardMatrixPane);
         if (bestMove == value.UP) {
-            cardMatrixPane.goUp();
+            cardMatrixPane.goUp2();
         } else if (bestMove == value.DOWN) {
-            cardMatrixPane.goDown();
+            cardMatrixPane.goDown2();
         } else if (bestMove == value.LEFT) {
-            cardMatrixPane.goLeft();
+            cardMatrixPane.goLeft2();
         } else if(bestMove == value.RIGHT) {
-            cardMatrixPane.goRight();
+            cardMatrixPane.goRight2();
         }
 
     }

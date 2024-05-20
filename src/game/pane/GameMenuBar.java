@@ -30,6 +30,7 @@ public class GameMenuBar extends MenuBar {
 		saveMenuItem.setOnAction(e->mCallbacks.save());
 		MenuItem exitMenuItem=new MenuItem("退出");//退出
 		exitMenuItem.setOnAction(e->mCallbacks.save());
+
 		exitMenuItem.setOnAction(e->Platform.exit());
 		gameMenu.getItems().addAll(restartMenuItem,saveMenuItem,exitMenuItem);
 		

@@ -20,7 +20,7 @@ public class GameAIMenu extends Pane {
 
     // instance variable
     private long previousTimestamp ;
-    private long nanoSecsPerFrame = Math.round(1.0/5 * 1e9);
+    private final long nanoSecsPerFrame = Math.round(1.0/20 * 1e9);
 
     public GameAIMenu(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
@@ -80,7 +80,7 @@ public class GameAIMenu extends Pane {
                 aiProcessed = true;
                 cardMatrixPane.beforeAction(); // Before action logic
                 gameAI.move(cardMatrixPane);       // Main action logic
-                if(cardMatrixPane.afterAction()) {// After action logic
+                if(cardMatrixPane.afterAction2()) {// After action logic
                     AllStepsButton.setStyle("-fx-background-color: #ffffff");
                     AllStepsButton.setText("电脑托管");
                     this.stop();
