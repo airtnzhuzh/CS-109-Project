@@ -71,20 +71,22 @@ public class GameAIMenu extends Pane {
             public void handle(long timeStamp) {
                 if (timeStamp - previousTimestamp < nanoSecsPerFrame)
                 {
+                    System.out.println("test01");
                     return;
                 }
                 previousTimestamp = timeStamp;
                 if (aiProcessed) {
+                    System.out.println("test02");
                     return;
                 }
                 aiProcessed = true;
                 cardMatrixPane.beforeAction(); // Before action logic
                 gameAI.move(cardMatrixPane);       // Main action logic
-                if(cardMatrixPane.afterAction2()) {// After action logic
+                if(!cardMatrixPane.afterAction2()) {// After action logic
+                    System.out.println("test03");
                     AllStepsButton.setStyle("-fx-background-color: #ffffff");
                     AllStepsButton.setText("电脑托管");
                     this.stop();
-
                 }
 
                 aiProcessed = false;

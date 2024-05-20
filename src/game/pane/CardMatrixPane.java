@@ -285,7 +285,9 @@ public class CardMatrixPane extends StackPane {
             if (isFull) {//矩阵已满,可能已经游戏结束
 
                 testOpe[0] |= testUp();//还能进行竖向操作
+                testOpe[0] |= testRight();//还能进行横向操作
                 testOpe[0] |= testLeft();//还能进行横向操作
+                testOpe[0] |= testDown();//还能进行竖向操作
                 if (!testOpe[0]) {//游戏结束
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle(alert.getAlertType().toString());
@@ -308,13 +310,17 @@ public class CardMatrixPane extends StackPane {
     public boolean afterAction2() {
         CardPane maxCard = getMaxCard();//最大卡片
         redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
-        boolean[] testOpe = {false};//是否还能进行横向或竖向操作
+        boolean[] testOpe = {true};//是否还能进行横向或竖向操作
 
         boolean isFull = !createRandomNumber2();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
         if (isFull) {//矩阵已满,可能已经游戏结束
+            testOpe[0] = false;
             testOpe[0] |= testUp();//还能进行竖向操作
+            testOpe[0] |= testRight();//还能进行横向操作
             testOpe[0] |= testLeft();//还能进行横向操作
+            testOpe[0] |= testDown();//还能进行竖向操作
+
         }
         return testOpe[0];
     }

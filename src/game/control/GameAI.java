@@ -1,16 +1,15 @@
 package edu.sustech.game.control;
 
 import edu.sustech.game.pane.CardMatrixPane;
-import edu.sustech.game.pane.CardPane;
 
 import java.util.Arrays;
 
 public class GameAI {
 
-    private final float smoothWeight = 0.1f;
+    private final float smoothWeight = 0.2f;
     private  final float monoWeight = 1.0f;
-    private final  float emptyWeight = 3.0f;
-    private  final float maxWeight = 2.0f;
+    private final  float emptyWeight = 3.2f;
+    private  final float maxWeight = 1.5f;
 
     private int[][] cps;
 
@@ -158,100 +157,190 @@ public class GameAI {
         }
     }
 
-    private void minmax(CardMatrixPane cardMatrixPaneOrigin,int depth, float[] max , value direction){
+
+//这是minmax算法
+//    private void minmax(CardMatrixPane cardMatrixPaneOrigin,int depth, float[] max , value direction){
+//        CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
+//        if(depth == 0){
+//            max[0] = Math.max(max[0], evaluate(cardMatrixPane));
+//            return;
+//        }
+//        if(direction == value.UP){
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goUp2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1,max, value.LEFT);
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goDown2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1,max, value.RIGHT);
+//        }else if(direction == value.DOWN){
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goDown2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1, max, value.LEFT);
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goUp2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1, max, value.RIGHT);
+//        }else if(direction == value.LEFT){
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goLeft2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1,max, value.UP);
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goRight2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
+//        }else if(direction == value.RIGHT){
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goRight2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1, max, value.UP);
+//            cardMatrixPane.beforeAction2();
+//            cardMatrixPane.goLeft2();
+//            cardMatrixPane.afterAction2();
+//            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
+//        }
+//    }
+
+    //这是alpha-beta剪枝算法
+    private float minmax(CardMatrixPane cardMatrixPaneOrigin, int depth, float alpha, float beta, value direction) {
         CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
-        if(depth == 0){
-            max[0] = Math.max(max[0], evaluate(cardMatrixPane));
-            return;
+        if (depth == 0) {
+            return evaluate(cardMatrixPane);
         }
-        if(direction == value.UP){
+        if (direction == value.UP) {
             cardMatrixPane.beforeAction2();
             cardMatrixPane.goUp2();
             cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1,max, value.LEFT);
+            float maxEval = Float.NEGATIVE_INFINITY;
+            for (value nextDirection : Arrays.asList(value.LEFT, value.RIGHT)) {
+                float eval = minmax(cardMatrixPane, depth - 1, alpha, beta, nextDirection);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return maxEval;
+        } else if (direction == value.DOWN) {
             cardMatrixPane.beforeAction2();
             cardMatrixPane.goDown2();
             cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1,max, value.RIGHT);
-        }else if(direction == value.DOWN){
-            cardMatrixPane.beforeAction2();
-            cardMatrixPane.goDown2();
-            cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1, max, value.LEFT);
-            cardMatrixPane.beforeAction2();
-            cardMatrixPane.goUp2();
-            cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1, max, value.RIGHT);
-        }else if(direction == value.LEFT){
-            cardMatrixPane.beforeAction2();
-            cardMatrixPane.goLeft2();
-            cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1,max, value.UP);
-            cardMatrixPane.beforeAction2();
-            cardMatrixPane.goRight2();
-            cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
-        }else if(direction == value.RIGHT){
-            cardMatrixPane.beforeAction2();
-            cardMatrixPane.goRight2();
-            cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1, max, value.UP);
+            float maxEval = Float.NEGATIVE_INFINITY;
+            for (value nextDirection : Arrays.asList(value.LEFT, value.RIGHT)) {
+                float eval = minmax(cardMatrixPane, depth - 1, alpha, beta, nextDirection);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return maxEval;
+        } else if (direction == value.LEFT) {
             cardMatrixPane.beforeAction2();
             cardMatrixPane.goLeft2();
             cardMatrixPane.afterAction2();
-            minmax(cardMatrixPane,depth - 1, max, value.DOWN);
+            float maxEval = Float.NEGATIVE_INFINITY;
+            for (value nextDirection : Arrays.asList(value.UP, value.DOWN)) {
+                float eval = minmax(cardMatrixPane, depth - 1, alpha, beta, nextDirection);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return maxEval;
+        } else if (direction == value.RIGHT) {
+            cardMatrixPane.beforeAction2();
+            cardMatrixPane.goRight2();
+            cardMatrixPane.afterAction2();
+            float maxEval = Float.NEGATIVE_INFINITY;
+            for (value nextDirection : Arrays.asList(value.UP, value.DOWN)) {
+                float eval = minmax(cardMatrixPane, depth - 1, alpha, beta, nextDirection);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return maxEval;
         }
+        return 0; // 如果direction为NULL，返回0
     }
 
-    public value findBestMove(CardMatrixPane cardMatrixPane) {
-        float[] maxUP = new float[1];
-        maxUP[0] = 0;
-        float[] maxDOWN = new float[1];
-        maxDOWN[0] = 0;
-        float[] maxLEFT = new float[1];
-        maxLEFT[0] = 0;
-        float[] maxRIGHT = new float[1];
-        maxRIGHT[0] = 0;
-        minmax(cardMatrixPane, 7, maxUP, value.UP);
-        minmax(cardMatrixPane, 7, maxDOWN, value.DOWN);
-        minmax(cardMatrixPane, 7, maxLEFT, value.LEFT);
-        minmax(cardMatrixPane, 7, maxRIGHT, value.RIGHT);
-        if (maxUP[0] > maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]) {
-            return value.UP;
-        }
-        if (maxDOWN[0] > maxUP[0] && maxDOWN[0] > maxLEFT[0] && maxDOWN[0] >maxRIGHT[0]) {
-            return value.DOWN;
-        }
-        if (maxLEFT[0] > maxUP[0] && maxLEFT[0] > maxDOWN[0] && maxLEFT[0] > maxRIGHT[0]) {
-            return value.LEFT;
-        }
-        if (maxRIGHT[0] > maxUP[0] && maxRIGHT[0] > maxDOWN[0] && maxRIGHT[0] > maxLEFT[0]) {
-            return value.RIGHT;
-        }
-        if(maxUP[0] == maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]){
-            //二分之一概率随机
-            int random = (int)(Math.random() * 2);
-            if(random == 0) return value.UP;
-            if(random == 1) return value.DOWN;
-        }
-        if(maxUP[0] == maxLEFT[0] && maxUP[0] > maxDOWN[0] && maxUP[0] > maxRIGHT[0]){
-            //二分之一概率随机
-            int random = (int)(Math.random() * 2);
-            if(random == 0) return value.UP;
-            if(random == 1) return value.LEFT;
-        }
-        if(maxUP[0] == 0 && maxDOWN[0] == 0 && maxLEFT[0] == 0 && maxRIGHT[0] == 0){
-            //四分之一概率随机
-            int random = (int)(Math.random() * 4);
-            if(random == 0) return value.UP;
-            if(random == 1) return value.DOWN;
-            if(random == 2) return value.LEFT;
-            if(random == 3) return value.RIGHT;
-        }
-        return value.NULL;
 
+//这是alpha-beta剪枝算法的findBestMove
+//    public value findBestMove(CardMatrixPane cardMatrixPane) {
+//        float[] maxUP = new float[1];
+//        maxUP[0] = 0;
+//        float[] maxDOWN = new float[1];
+//        maxDOWN[0] = 0;
+//        float[] maxLEFT = new float[1];
+//        maxLEFT[0] = 0;
+//        float[] maxRIGHT = new float[1];
+//        maxRIGHT[0] = 0;
+//        minmax(cardMatrixPane, 15, maxUP, value.UP);
+//        minmax(cardMatrixPane, 15, maxDOWN, value.DOWN);
+//        minmax(cardMatrixPane, 15, maxLEFT, value.LEFT);
+//        minmax(cardMatrixPane, 15, maxRIGHT, value.RIGHT);
+//        if (maxUP[0] > maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]) {
+//            return value.UP;
+//        }
+//        if (maxDOWN[0] > maxUP[0] && maxDOWN[0] > maxLEFT[0] && maxDOWN[0] >maxRIGHT[0]) {
+//            return value.DOWN;
+//        }
+//        if (maxLEFT[0] > maxUP[0] && maxLEFT[0] > maxDOWN[0] && maxLEFT[0] > maxRIGHT[0]) {
+//            return value.LEFT;
+//        }
+//        if (maxRIGHT[0] > maxUP[0] && maxRIGHT[0] > maxDOWN[0] && maxRIGHT[0] > maxLEFT[0]) {
+//            return value.RIGHT;
+//        }
+//        if(maxUP[0] == maxDOWN[0] && maxUP[0] > maxLEFT[0] && maxUP[0] > maxRIGHT[0]){
+//            //二分之一概率随机
+//            int random = (int)(Math.random() * 2);
+//            if(random == 0) return value.UP;
+//            if(random == 1) return value.DOWN;
+//        }
+//        if(maxUP[0] == maxLEFT[0] && maxUP[0] > maxDOWN[0] && maxUP[0] > maxRIGHT[0]){
+//            //二分之一概率随机
+//            int random = (int)(Math.random() * 2);
+//            if(random == 0) return value.UP;
+//            if(random == 1) return value.LEFT;
+//        }
+//        if(maxUP[0] == 0 && maxDOWN[0] == 0 && maxLEFT[0] == 0 && maxRIGHT[0] == 0){
+//            //四分之一概率随机
+//            int random = (int)(Math.random() * 4);
+//            if(random == 0) return value.UP;
+//            if(random == 1) return value.DOWN;
+//            if(random == 2) return value.LEFT;
+//            if(random == 3) return value.RIGHT;
+//        }
+//        return value.NULL;
+//
+//
+//    }
+    //这是alpha-beta剪枝算法的findBestMove
+public value findBestMove(CardMatrixPane cardMatrixPane) {
+    float alpha = Float.NEGATIVE_INFINITY;
+    float beta = Float.POSITIVE_INFINITY;
+    float maxEval = Float.NEGATIVE_INFINITY;
+    value bestMove = value.NULL;
 
+    for (value direction : Arrays.asList(value.UP, value.DOWN, value.LEFT, value.RIGHT)) {
+        CardMatrixPane cardMatrixPaneCopy = cardMatrixPane.clone();
+        float eval = minmax(cardMatrixPaneCopy, 7, alpha, beta, direction);
+        if (eval > maxEval) {
+            maxEval = eval;
+            bestMove = direction;
+        }
+        alpha = Math.max(alpha, eval);
     }
+
+    return bestMove;
+}
+
 
     public void move(CardMatrixPane cardMatrixPane) {
         value bestMove = findBestMove(cardMatrixPane);
