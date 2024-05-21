@@ -241,40 +241,40 @@ public class GameAI {
     public value findBestMove(CardMatrixPane cardMatrixPane) {
 
         float tempMaxUP = 0.00f;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             int[] maxUP = new int[1];
             maxUP[0] = 0;
-            minmax(cardMatrixPane, 4, maxUP, value.UP);
+            minmax(cardMatrixPane, 6, maxUP, value.UP);
             tempMaxUP += maxUP[0];
         }
-        float MaxUP = tempMaxUP / 10;
+        float MaxUP = tempMaxUP / 5;
 
         float tempMaxDOWN = 0.00f;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             int[] maxDOWN = new int[1];
             maxDOWN[0] = 0;
-            minmax(cardMatrixPane, 4, maxDOWN, value.DOWN);
+            minmax(cardMatrixPane, 6, maxDOWN, value.DOWN);
             tempMaxDOWN += maxDOWN[0];
         }
-        float MaxDOWN = tempMaxDOWN / 10;
+        float MaxDOWN = tempMaxDOWN / 5;
 
         float tempMaxLEFT = 0.00f;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             int[] maxLEFT = new int[1];
             maxLEFT[0] = 0;
-            minmax(cardMatrixPane, 4, maxLEFT, value.LEFT);
+            minmax(cardMatrixPane, 6, maxLEFT, value.LEFT);
             tempMaxLEFT += maxLEFT[0];
         }
-        float MaxLEFT = tempMaxLEFT / 10;
+        float MaxLEFT = tempMaxLEFT / 5;
 
         float tempMaxRIGHT = 0.00f;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             int[] maxRIGHT = new int[1];
             maxRIGHT[0] = 0;
-            minmax(cardMatrixPane, 4, maxRIGHT, value.RIGHT);
+            minmax(cardMatrixPane, 6, maxRIGHT, value.RIGHT);
             tempMaxRIGHT += maxRIGHT[0];
         }
-        float MaxRIGHT = tempMaxRIGHT / 10;
+        float MaxRIGHT = tempMaxRIGHT / 5;
 
         if (MaxUP > MaxDOWN && MaxUP > MaxLEFT && MaxUP > MaxRIGHT) {
             return value.UP;
