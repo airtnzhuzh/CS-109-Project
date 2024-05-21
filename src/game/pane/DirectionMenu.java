@@ -4,6 +4,7 @@ package edu.sustech.game.pane;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
 import javafx.scene.layout.HBox;
@@ -50,29 +51,61 @@ private  VBox menu;
         upButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goUp();        // Main action logic
-            cardMatrixPane.afterAction(); // After action logic
+            if (cardMatrixPane.testUp())  {
+                cardMatrixPane.goUp();        // Main action logic
+            cardMatrixPane.afterAction();
+            } // After action logic
+            if(cardMatrixPane.isGameOver()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                alert.show();
+            }
         });
 
         downButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goDown();       // Main action logic
-            cardMatrixPane.afterAction();  // After action logic
+            if (cardMatrixPane.testDown()) {
+                cardMatrixPane.goDown();       // Main action logic
+                cardMatrixPane.afterAction();  // After action logic
+            }
+            if(cardMatrixPane.isGameOver()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                alert.show();
+            }
         });
 
         leftButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goLeft();       // Main action logic
-            cardMatrixPane.afterAction();  // After action logic
+            if (cardMatrixPane.testLeft()) {
+                cardMatrixPane.goLeft();       // Main action logic
+                cardMatrixPane.afterAction();  // After action logic
+            }
+            if(cardMatrixPane.isGameOver()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                alert.show();
+            }
         });
 
         rightButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
-            cardMatrixPane.goRight();      // Main action logic
-            cardMatrixPane.afterAction();  // After action logic
+            if (cardMatrixPane.testRight()) {
+                cardMatrixPane.goRight();      // Main action logic
+                cardMatrixPane.afterAction();  // After action logic
+            }
+            if(cardMatrixPane.isGameOver()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                alert.show();
+            }
         });
         // 设置事件处理程序
 //        setOnAction(e -> {//鼠标按下事件

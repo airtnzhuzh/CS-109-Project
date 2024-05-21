@@ -236,23 +236,47 @@ public class CardMatrixPane extends StackPane {
                 case UP:
                 case W:
                     System.out.println("goUp02");
-                    goUp();//↑
-                    afterAction();
+                    if(testUp()) {goUp();//↑
+                    afterAction();}
+                    if(isGameOver()){
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle(alert.getAlertType().toString());
+                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                        alert.show();
+                    }
                     break;
                 case DOWN:
                 case S:
-                    goDown();//↓
-                    afterAction();
+                    if(testDown()){goDown();//↓
+                    afterAction();}
+                    if(isGameOver()){
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle(alert.getAlertType().toString());
+                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                        alert.show();
+                    }
                     break;
                 case LEFT:
                 case A:
-                    goLeft();//←
-                    afterAction();
+                    if(testLeft()) {goLeft();//←
+                    afterAction();}
+                    if(isGameOver()){
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle(alert.getAlertType().toString());
+                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                        alert.show();
+                    }
                     break;
                 case RIGHT:
                 case D:
-                    goRight();//→
-                    afterAction();
+                    if(testRight()) {goRight();//→
+                    afterAction();}
+                    if(isGameOver()){
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle(alert.getAlertType().toString());
+                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                        alert.show();
+                    }
                     break;
                 default:
                     return;//未定义的操作
@@ -269,7 +293,7 @@ public class CardMatrixPane extends StackPane {
 
 
 
-    public boolean afterAction() {
+    public void afterAction() {
         CardPane maxCard = getMaxCard();//最大卡片
         redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
 
@@ -280,22 +304,23 @@ public class CardMatrixPane extends StackPane {
         // 设置动画结束后的操作
         pause.setOnFinished(event -> {
 
-            boolean isFull = !createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+//            boolean isFull = !
+                    createRandomNumber();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
 
-            if (isFull) {//矩阵已满,可能已经游戏结束
-
-                testOpe[0] |= testUp();//还能进行竖向操作
-                testOpe[0] |= testRight();//还能进行横向操作
-                testOpe[0] |= testLeft();//还能进行横向操作
-                testOpe[0] |= testDown();//还能进行竖向操作
-                if (!testOpe[0]) {//游戏结束
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle(alert.getAlertType().toString());
-                    alert.setContentText("游戏结束,本次最大数字为" + maxCard.getNumber() + ",可在菜单栏选择重新开始\n");
-                    alert.show();
-                }
-
-            }
+//            if (isFull) {//矩阵已满,可能已经游戏结束
+//
+//                testOpe[0] |= testUp();//还能进行竖向操作
+//                testOpe[0] |= testRight();//还能进行横向操作
+//                testOpe[0] |= testLeft();//还能进行横向操作
+//                testOpe[0] |= testDown();//还能进行竖向操作
+//                if (!testOpe[0]) {//游戏结束
+//                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//                    alert.setTitle(alert.getAlertType().toString());
+//                    alert.setContentText("游戏结束,本次最大数字为" + maxCard.getNumber() + ",可在菜单栏选择重新开始\n");
+//                    alert.show();
+//                }
+//
+//            }
 
 
         });
@@ -303,27 +328,48 @@ public class CardMatrixPane extends StackPane {
 
 // 开始动画
         pause.play();
-        return testOpe[0];
     }
 
     //无动画版本的afterAction，AI专用
-    public boolean afterAction2() {
+    public void afterAction2() {
         CardPane maxCard = getMaxCard();//最大卡片
         redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+        createRandomNumber2();
+//        boolean[] testOpe = {true};//是否还能进行横向或竖向操作
+//
+//        boolean isFull = !createRandomNumber2();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+//
+//        if (isFull) {//矩阵已满,可能已经游戏结束
+//            testOpe[0] = false;
+//            testOpe[0] |= testUp();//还能进行竖向操作
+//            testOpe[0] |= testRight();//还能进行横向操作
+//            testOpe[0] |= testLeft();//还能进行横向操作
+//            testOpe[0] |= testDown();//还能进行竖向操作
+//        }
+    }
+
+    public boolean isGameOver(){
         boolean[] testOpe = {true};//是否还能进行横向或竖向操作
 
-        boolean isFull = !createRandomNumber2();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+        boolean isFull = !isFull();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
+        System.out.println(isFull);
 
         if (isFull) {//矩阵已满,可能已经游戏结束
             testOpe[0] = false;
             testOpe[0] |= testUp();//还能进行竖向操作
+            System.out.println(testOpe[0]);
             testOpe[0] |= testRight();//还能进行横向操作
+            System.out.println(testOpe[0]);
             testOpe[0] |= testLeft();//还能进行横向操作
+            System.out.println(testOpe[0]);
             testOpe[0] |= testDown();//还能进行竖向操作
-
+            System.out.println(testOpe[0]);
         }
-        return testOpe[0];
+        System.out.println(!testOpe[0]);
+        return !testOpe[0];
     }
+
+
 
 
     /*
@@ -522,7 +568,7 @@ public class CardMatrixPane extends StackPane {
     /**
      * 测试是否能向上操作
      */
-    private boolean testUp() {
+    public boolean testUp() {
         for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
             for (int j = 1; j < rows; j++) {//从第二行起向下,遍历卡片矩阵的行
                 CardPane card = cps[i][j];
@@ -538,7 +584,7 @@ public class CardMatrixPane extends StackPane {
     /**
      * 测试是否能向下操作
      */
-    private boolean testDown() {
+    public boolean testDown() {
         for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
             for (int j = rows - 2; j >= 0; j--) {//从倒数第二行起向上,遍历卡片矩阵的行
                 CardPane card = cps[i][j];
@@ -554,7 +600,7 @@ public class CardMatrixPane extends StackPane {
     /**
      * 测试是否能向左操作
      */
-    private boolean testLeft() {
+    public boolean testLeft() {
         for (int i = 1; i < cols; i++) {//从第二列起向右,遍历卡片矩阵的列
             for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
                 CardPane card = cps[i][j];
@@ -570,7 +616,7 @@ public class CardMatrixPane extends StackPane {
     /**
      * 测试是否能向右操作
      */
-    private boolean testRight() {
+    public boolean testRight() {
         for (int i = cols - 2; i >= 0; i--) {//从倒数第二列起向左,遍历卡片矩阵的列
             for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
                 CardPane card = cps[i][j];
@@ -606,7 +652,7 @@ public class CardMatrixPane extends StackPane {
     /**
      * 获取卡片矩阵中的最大卡片
      */
-    private CardPane getMaxCard() {
+    public CardPane getMaxCard() {
         CardPane maxCard = new CardPane();//type=0的新卡片
         for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
             for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
@@ -678,11 +724,10 @@ public class CardMatrixPane extends StackPane {
         }
         return true;
     }
-
-    /**
-     * 无动画版本
-     * 在随机的空卡片上生成新的数字,若矩阵已满,或生成数字后满,则返回false
+    /*
+    无动画版本
      */
+
     public boolean createRandomNumber2() {
         List<CardPane> voidCards = new ArrayList<>();//空卡片列表
 
@@ -711,12 +756,31 @@ public class CardMatrixPane extends StackPane {
         int voidCardIndex = (int) (Math.random() * len);
         CardPane card = voidCards.get(voidCardIndex);
         card.setType(type);//更新type,生成数字
-
         card.draw();//重绘此卡片
         if (len == 1) {//只有一个空卡片,矩阵生成数字后满
             return false;
         }
         return true;
+    }
+
+    /**
+     *
+     * 若矩阵已满则返回false
+     */
+    public boolean isFull() {
+        List<CardPane> voidCards = new ArrayList<>();//空卡片列表
+
+        for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
+            for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
+                CardPane card = cps[i][j];
+                if (card.getType() == 0) {//是空卡片
+                    voidCards.add(card);//添加到列表中
+                }
+            }
+        }
+        int len = voidCards.size();
+        //没有空卡片了,返回
+        return len != 0;//判满
     }
 
     /**
@@ -823,6 +887,19 @@ public class CardMatrixPane extends StackPane {
         }
         clone.setCps(cpsClone);
         return clone;
+    }
+    public String getBoardString(){
+        StringBuilder boardString = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (getCps()[i][j] != null) {
+                    boardString.append(getCps()[i][j].getNumber());
+                } else {
+                    boardString.append("0");
+                }
+            }
+        }
+        return boardString.toString();
     }
 
 

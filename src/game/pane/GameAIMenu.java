@@ -3,6 +3,7 @@ package edu.sustech.game.pane;
 import edu.sustech.game.app.Game;
 import edu.sustech.game.control.GameAI;
 import javafx.animation.AnimationTimer;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -20,7 +21,7 @@ public class GameAIMenu extends Pane {
 
     // instance variable
     private long previousTimestamp ;
-    private final long nanoSecsPerFrame = Math.round(1.0/20 * 1e9);
+    private final long nanoSecsPerFrame = Math.round(1.0/10 * 1e9);
 
     public GameAIMenu(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
@@ -45,7 +46,12 @@ public class GameAIMenu extends Pane {
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
             gameAI.move(cardMatrixPane);       // Main action logic
-            cardMatrixPane.afterAction(); // After action logic
+            if(cardMatrixPane.isGameOver()){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                alert.show();
+            } // After action logic
         });
 
 
@@ -68,25 +74,26 @@ public class GameAIMenu extends Pane {
 
 
             @Override
-            public void handle(long timeStamp) {
-                if (timeStamp - previousTimestamp < nanoSecsPerFrame)
-                {
-                    System.out.println("test01");
-                    return;
-                }
-                previousTimestamp = timeStamp;
+            public void handle(long now) {
+
                 if (aiProcessed) {
                     System.out.println("test02");
+                    aiProcessed = true;
                     return;
                 }
                 aiProcessed = true;
-                cardMatrixPane.beforeAction(); // Before action logic
+                System.out.println(111);
                 gameAI.move(cardMatrixPane);       // Main action logic
-                if(!cardMatrixPane.afterAction2()) {// After action logic
+                System.out.println(222);
+                if(cardMatrixPane.isGameOver()) {// After action logic
                     System.out.println("test03");
                     AllStepsButton.setStyle("-fx-background-color: #ffffff");
                     AllStepsButton.setText("电脑托管");
                     this.stop();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle(alert.getAlertType().toString());
+                    alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
+                    alert.show();
                 }
 
                 aiProcessed = false;
