@@ -22,141 +22,6 @@ public class GameAI {
     }
 
 
-    private float smoothness(CardMatrixPane cardMatrixPane) {
-        float smoothness = 0;
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 4; y++) {
-                if (cardMatrixPane.getCps()[x][y] != null) {
-                    int value = cardMatrixPane.getCps()[x][y].getNumber();
-                    int[] values = new int[4];
-                    int index = 0;
-                    for (int i = 0; i < 4; i++) {
-                        if (cardMatrixPane.getCps()[x][i] != null) {
-                            values[index] = cardMatrixPane.getCps()[x][i].getNumber();
-                            index++;
-                        }
-                    }
-                    for (int i = 0; i < 3; i++) {
-                        if (values[i] != 0) {
-                            if (values[i] == values[i + 1]) {
-                                smoothness += 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for (int y = 0; y < 4; y++) {
-            for (int x = 0; x < 4; x++) {
-                if (cardMatrixPane.getCps()[x][y] != null) {
-                    int value = cardMatrixPane.getCps()[x][y].getNumber();
-                    int[] values = new int[4];
-                    int index = 0;
-                    for (int i = 0; i < 4; i++) {
-                        if (cardMatrixPane.getCps()[i][y] != null) {
-                            values[index] = cardMatrixPane.getCps()[i][y].getNumber();
-                            index++;
-                        }
-                    }
-                    for (int i = 0; i < 3; i++) {
-                        if (values[i] != 0) {
-                            if (values[i] == values[i + 1]) {
-                                smoothness += 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return smoothness;
-    }
-
-
-    private float monotonicity(CardMatrixPane cardMatrixPane) {
-        int[] totals = new int[4];
-        for (int x = 0; x < 4; x++) {
-            int current = 0;
-            int next = current + 1;
-            while (next < 4) {
-                while (next < 4 && cardMatrixPane.getCps()[x][next] == null) {
-                    next++;
-                }
-                if (next >= 4) {
-                    next--;
-                }
-                int currentValue = cardMatrixPane.getCps()[x][current] == null ? 0 : cardMatrixPane.getCps()[x][current].getNumber();
-                int nextValue = cardMatrixPane.getCps()[x][next] == null ? 0 : cardMatrixPane.getCps()[x][next].getNumber();
-                if (currentValue > nextValue) {
-                    totals[0] += nextValue - currentValue;
-                } else if (nextValue > currentValue) {
-                    totals[1] += currentValue - nextValue;
-                }
-                current = next;
-                next++;
-            }
-        }
-        for (int y = 0; y < 4; y++) {
-            int current = 0;
-            int next = current + 1;
-            while (next < 4) {
-                while (next < 4 && cardMatrixPane.getCps()[next][y] == null) {
-                    next++;
-                }
-                if (next >= 4) {
-                    next--;
-                }
-                int currentValue = cardMatrixPane.getCps()[current][y] == null ? 0 : cardMatrixPane.getCps()[current][y].getNumber();
-                int nextValue = cardMatrixPane.getCps()[next][y] == null ? 0 : cardMatrixPane.getCps()[next][y].getNumber();
-                if (currentValue > nextValue) {
-                    totals[2] += nextValue - currentValue;
-                } else if (nextValue > currentValue) {
-                    totals[3] += currentValue - nextValue;
-                }
-                current = next;
-                next++;
-            }
-        }
-        return Math.max(totals[0], totals[1]) + Math.max(totals[2], totals[3]);
-    }
-
-    private float emptyCells(CardMatrixPane cardMatrixPane) {
-        float emptyCells = 0;
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 4; y++) {
-                if (cardMatrixPane.getCps()[x][y] == null) {
-                    emptyCells++;
-                }
-            }
-        }
-        return emptyCells;
-    }
-
-    private float maxValue(CardMatrixPane cardMatrixPane) {
-        int max = 0;
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 4; y++) {
-                if (cardMatrixPane.getCps()[x][y] != null) {
-                    int value = cardMatrixPane.getCps()[x][y].getNumber();
-                    if (value > max) {
-                        max = value;
-                    }
-                }
-            }
-        }
-        return max;
-    }
-
-    private float evaluate(CardMatrixPane cardMatrixPane) {
-        if (cardMatrixPane.isGameOver()) {
-            return -0.1f;
-        } else {
-            return smoothWeight * smoothness(cardMatrixPane)
-                    + monoWeight * monotonicity(cardMatrixPane)
-                    + emptyWeight * emptyCells(cardMatrixPane)
-                    + maxWeight * (float) Math.log(maxValue(cardMatrixPane));
-        }
-    }
-
 
     //这是minmax算法
     private void minmax(CardMatrixPane cardMatrixPaneOrigin, int depth, int[] max, value direction) {
@@ -172,17 +37,12 @@ public class GameAI {
             if (cardMatrixPane.testUp()) {
                 cardMatrixPane.goUp2();
                 cardMatrixPane.afterAction2();
-                String boardState1 = cardMatrixPane.getBoardString();
-
-
             }
             minmax(cardMatrixPane, depth - 1, max, value.LEFT);
             cardMatrixPane.beforeAction2();
             if (cardMatrixPane.testDown()) {
                 cardMatrixPane.goDown2();
                 cardMatrixPane.afterAction2();
-                String boardState1 = cardMatrixPane.getBoardString();
-
             }
             minmax(cardMatrixPane, depth - 1, max, value.RIGHT);
         } else if (direction == value.DOWN) {
@@ -190,8 +50,74 @@ public class GameAI {
             if (cardMatrixPane.testDown()) {
                 cardMatrixPane.goDown2();
                 cardMatrixPane.afterAction2();
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.LEFT);
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testUp()) {
+                cardMatrixPane.goUp2();
+                cardMatrixPane.afterAction2();
 
 
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.RIGHT);
+        } else if (direction == value.LEFT) {
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testLeft()) {
+                cardMatrixPane.goLeft2();
+                cardMatrixPane.afterAction2();
+
+
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.UP);
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testRight()) {
+                cardMatrixPane.goRight2();
+                cardMatrixPane.afterAction2();
+
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.DOWN);
+        } else if (direction == value.RIGHT) {
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testRight()) {
+                cardMatrixPane.goRight2();
+                cardMatrixPane.afterAction2();
+
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.UP);
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testLeft()) {
+                cardMatrixPane.goLeft2();
+                cardMatrixPane.afterAction2();
+
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.DOWN);
+        }
+    }
+
+    private void maxAVG(CardMatrixPane cardMatrixPaneOrigin, int depth, int[] max, value direction) {
+
+        CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
+        if (depth == 0) {
+            EvaluationFunction.evaluate(cardMatrixPane);
+        }
+        if (direction == value.UP) {
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testUp()) {
+                cardMatrixPane.goUp2();
+                cardMatrixPane.afterAction2();
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.LEFT);
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testDown()) {
+                cardMatrixPane.goDown2();
+                cardMatrixPane.afterAction2();
+            }
+            minmax(cardMatrixPane, depth - 1, max, value.RIGHT);
+        } else if (direction == value.DOWN) {
+            cardMatrixPane.beforeAction2();
+            if (cardMatrixPane.testDown()) {
+                cardMatrixPane.goDown2();
+                cardMatrixPane.afterAction2();
             }
             minmax(cardMatrixPane, depth - 1, max, value.LEFT);
             cardMatrixPane.beforeAction2();
@@ -331,26 +257,22 @@ public class GameAI {
                 cardMatrixPane.goUp2();
                 cardMatrixPane.afterAction2();
             }
-        }
-        else if (bestMove == value.DOWN) {
+        } else if (bestMove == value.DOWN) {
             if (cardMatrixPane.testDown()) {
                 cardMatrixPane.goDown2();
                 cardMatrixPane.afterAction2();
             }
-        }
-        else if (bestMove == value.LEFT) {
+        } else if (bestMove == value.LEFT) {
             if (cardMatrixPane.testLeft()) {
                 cardMatrixPane.goLeft2();
                 cardMatrixPane.afterAction2();
             }
-        }
-        else if (bestMove == value.RIGHT) {
+        } else if (bestMove == value.RIGHT) {
             if (cardMatrixPane.testRight()) {
                 cardMatrixPane.goRight2();
                 cardMatrixPane.afterAction2();
             }
-        }
-        else if (bestMove == value.LEFT_DOWN) {
+        } else if (bestMove == value.LEFT_DOWN) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -377,8 +299,7 @@ public class GameAI {
 
             }
 
-        }
-        else if (bestMove == value.LEFT_RIGHT) {
+        } else if (bestMove == value.LEFT_RIGHT) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -405,8 +326,7 @@ public class GameAI {
 
             }
 
-        }
-        else if (bestMove == value.UP_DOWN) {
+        } else if (bestMove == value.UP_DOWN) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -433,8 +353,7 @@ public class GameAI {
 
             }
 
-        }
-        else if (bestMove == value.UP_LEFT) {
+        } else if (bestMove == value.UP_LEFT) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -461,8 +380,7 @@ public class GameAI {
 
             }
 
-        }
-        else if (bestMove == value.UP_RIGHT) {
+        } else if (bestMove == value.UP_RIGHT) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -488,8 +406,7 @@ public class GameAI {
 
                 }
             }
-        }
-        else if (bestMove == value.RIGHT_DOWN) {
+        } else if (bestMove == value.RIGHT_DOWN) {
             //50%概率
             Random random = new Random();
             int i = random.nextInt(2);
@@ -514,8 +431,7 @@ public class GameAI {
                     }
                 }
             }
-        }
-        else if (bestMove == value._UP) {
+        } else if (bestMove == value._UP) {
             //三分之一概率
             Random random = new Random();
             int i = random.nextInt(3);
@@ -532,15 +448,13 @@ public class GameAI {
                 }
             } else if (i == 1) {
 
-                 if(cardMatrixPane.testLeft()){
+                if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goLeft2();
                     cardMatrixPane.afterAction2();
-                }
-                else if(cardMatrixPane.testDown()){
+                } else if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
-                }
-                else if(cardMatrixPane.testRight()){
+                } else if (cardMatrixPane.testRight()) {
                     cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
                 }
@@ -548,19 +462,16 @@ public class GameAI {
                 if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goLeft2();
                     cardMatrixPane.afterAction2();
-                }
-                else if(cardMatrixPane.testDown()){
+                } else if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
-                }
-                else if(cardMatrixPane.testRight()){
+                } else if (cardMatrixPane.testRight()) {
                     cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
                 }
             }
 
-        }
-        else if (bestMove == value._DOWN) {
+        } else if (bestMove == value._DOWN) {
             //三分之一概率
             Random random = new Random();
             int i = random.nextInt(3);
@@ -578,8 +489,7 @@ public class GameAI {
                 }
             }
 
-        }
-        else if (bestMove == value._LEFT) {
+        } else if (bestMove == value._LEFT) {
             //三分之一概率
             Random random = new Random();
             int i = random.nextInt(3);
@@ -618,8 +528,7 @@ public class GameAI {
                 }
             }
 
-        }
-        else if (bestMove == value._RIGHT) {
+        } else if (bestMove == value._RIGHT) {
             //三分之一概率
             Random random = new Random();
             int i = random.nextInt(3);
@@ -659,8 +568,7 @@ public class GameAI {
                 }
             }
 
-        }
-        else if (bestMove == value.ALL) {
+        } else if (bestMove == value.ALL) {
             //四分之一概率
             Random random = new Random();
             int i = random.nextInt(4);
