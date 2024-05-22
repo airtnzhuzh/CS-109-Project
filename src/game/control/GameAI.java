@@ -324,75 +324,6 @@ public class GameAI {
     }
 
 
-    //这里是alpha-beta剪枝算法
-    private void alphaBeta(CardMatrixPane cardMatrixPaneOrigin, int depth, float[] alpha, float[] beta, value direction) {
-        CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
-        if (depth == 0) {
-            float score = EvaluationFunction.evaluate(cardMatrixPane);
-            alpha[0] = Math.max(alpha[0], score);
-            return;
-        }
-        if (direction == value.UP) {
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testUp()) {
-                cardMatrixPane.goUp2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.LEFT);
-            }
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testDown()) {
-                cardMatrixPane.goDown2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.RIGHT);
-            }
-        } else if (direction == value.DOWN) {
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testDown()) {
-                cardMatrixPane.goDown2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.LEFT);
-            }
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testUp()) {
-                cardMatrixPane.goUp2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.RIGHT);
-            }
-        } else if (direction == value.LEFT) {
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testLeft()) {
-                cardMatrixPane.goLeft2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.UP);
-            }
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testRight()) {
-                cardMatrixPane.goRight2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.DOWN);
-            }
-        } else if (direction == value.RIGHT) {
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testRight()) {
-                cardMatrixPane.goRight2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.UP);
-            }
-            cardMatrixPane.beforeAction2();
-            if (cardMatrixPane.testLeft()) {
-                cardMatrixPane.goLeft2();
-                cardMatrixPane.afterAction2();
-                alphaBeta(cardMatrixPane, depth - 1, alpha, beta, value.DOWN);
-            }
-        }
-
-        // 剪枝：如果alpha >= beta，则不再继续搜索，直接返回
-        if (alpha[0] >= beta[0]) {
-            return;
-        }
-    }
-
-
     public void move(CardMatrixPane cardMatrixPane) {
         value bestMove = findBestMove(cardMatrixPane);
         if (bestMove == value.UP) {
@@ -400,17 +331,20 @@ public class GameAI {
                 cardMatrixPane.goUp2();
                 cardMatrixPane.afterAction2();
             }
-        } else if (bestMove == value.DOWN) {
+        }
+        else if (bestMove == value.DOWN) {
             if (cardMatrixPane.testDown()) {
                 cardMatrixPane.goDown2();
                 cardMatrixPane.afterAction2();
             }
-        } else if (bestMove == value.LEFT) {
+        }
+        else if (bestMove == value.LEFT) {
             if (cardMatrixPane.testLeft()) {
                 cardMatrixPane.goLeft2();
                 cardMatrixPane.afterAction2();
             }
-        } else if (bestMove == value.RIGHT) {
+        }
+        else if (bestMove == value.RIGHT) {
             if (cardMatrixPane.testRight()) {
                 cardMatrixPane.goRight2();
                 cardMatrixPane.afterAction2();
@@ -586,20 +520,41 @@ public class GameAI {
             Random random = new Random();
             int i = random.nextInt(3);
             if (i == 0) {
-                if (cardMatrixPane.testUp()) {
-                    cardMatrixPane.goUp2();
-                    cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 1) {
                 if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
                 }
-            }
-            else if (i == 2) {
+            } else if (i == 1) {
+
+                 if(cardMatrixPane.testLeft()){
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                }
+                else if(cardMatrixPane.testDown()){
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                }
+                else if(cardMatrixPane.testRight()){
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
+                }
+            } else if (i == 2) {
                 if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                }
+                else if(cardMatrixPane.testDown()){
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                }
+                else if(cardMatrixPane.testRight()){
+                    cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
                 }
             }
@@ -610,18 +565,13 @@ public class GameAI {
             Random random = new Random();
             int i = random.nextInt(3);
             if (i == 0) {
-                if (cardMatrixPane.testDown()) {
-                    cardMatrixPane.goDown2();
-                    cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 1) {
+
+            } else if (i == 1) {
                 if (cardMatrixPane.testUp()) {
                     cardMatrixPane.goUp2();
                     cardMatrixPane.afterAction2();
                 }
-            }
-            else if (i == 2) {
+            } else if (i == 2) {
                 if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goLeft2();
                     cardMatrixPane.afterAction2();
@@ -634,20 +584,36 @@ public class GameAI {
             Random random = new Random();
             int i = random.nextInt(3);
             if (i == 0) {
-                if (cardMatrixPane.testLeft()) {
-                    cardMatrixPane.goLeft2();
+                if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 1) {
-                if (cardMatrixPane.testDown()) {
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
                 }
-            }
-            else if (i == 2) {
+            } else if (i == 1) {
+                if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                }
+            } else if (i == 2) {
                 if (cardMatrixPane.testUp()) {
                     cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
                 }
             }
@@ -658,20 +624,37 @@ public class GameAI {
             Random random = new Random();
             int i = random.nextInt(3);
             if (i == 0) {
-                if (cardMatrixPane.testRight()) {
+                if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 1) {
-                if (cardMatrixPane.testDown()) {
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
                 }
-            }
-            else if (i == 2) {
+
+            } else if (i == 1) {
+                if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                }
+            } else if (i == 2) {
                 if (cardMatrixPane.testUp()) {
                     cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
                     cardMatrixPane.afterAction2();
                 }
             }
@@ -685,110 +668,140 @@ public class GameAI {
                 if (cardMatrixPane.testUp()) {
                     cardMatrixPane.goUp2();
                     cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 1) {
-                if (cardMatrixPane.testDown()) {
+                } else if (cardMatrixPane.testDown()) {
                     cardMatrixPane.goDown2();
                     cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 2) {
-                if (cardMatrixPane.testLeft()) {
+                } else if (cardMatrixPane.testLeft()) {
                     cardMatrixPane.goLeft2();
                     cardMatrixPane.afterAction2();
-                }
-            }
-            else if (i == 3) {
-                if (cardMatrixPane.testRight()) {
+                } else if (cardMatrixPane.testRight()) {
                     cardMatrixPane.goRight2();
                     cardMatrixPane.afterAction2();
                 }
+            } else if (i == 1) {
+                if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                }
+            } else if (i == 2) {
+                if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                }
+            } else if (i == 3) {
+                if (cardMatrixPane.testRight()) {
+                    cardMatrixPane.goRight2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testUp()) {
+                    cardMatrixPane.goUp2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testDown()) {
+                    cardMatrixPane.goDown2();
+                    cardMatrixPane.afterAction2();
+                } else if (cardMatrixPane.testLeft()) {
+                    cardMatrixPane.goLeft2();
+                    cardMatrixPane.afterAction2();
+                }
+
             }
-
-
 
 
         }
     }
-
-
 
 
 }
 
 class EvaluationFunction {
 
-        // 三种阵型的权值矩阵
-        private static final int[][][] weightMatrices = {
-                {
-                        {16, 15, 14, 13},
-                        {9, 10, 11, 12},
-                        {8, 7, 6, 5,},
-                        {1, 2, 3, 4},
-                },
-                {
-                        {16, 15, 12, 4},
-                        {14, 13, 11, 3},
-                        {10, 9, 8, 2},
-                        {7, 6, 5, 1},
+    // 三种阵型的权值矩阵
+    private static final int[][][] weightMatrices = {
+            {
+                    {16, 15, 14, 13},
+                    {9, 10, 11, 12},
+                    {8, 7, 6, 5,},
+                    {1, 2, 3, 4},
+            },
+            {
+                    {16, 15, 12, 4},
+                    {14, 13, 11, 3},
+                    {10, 9, 8, 2},
+                    {7, 6, 5, 1},
 
-                },
-                {
-                        {16, 15, 14, 4},
-                        {13, 12, 11, 3},
-                        {10, 9, 8, 2},
-                        {7, 6, 5, 1},
-                }
-        };
+            },
+            {
+                    {16, 15, 14, 4},
+                    {13, 12, 11, 3},
+                    {10, 9, 8, 2},
+                    {7, 6, 5, 1},
+            }
+    };
 
-        public static int evaluate(CardMatrixPane cardMatrixPane) {
-            int[][] board = new int[4][4];
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    if (cardMatrixPane.getCps()[i][j] != null) {
-                        board[i][j] = cardMatrixPane.getCps()[i][j].getNumber();
-                    } else {
-                        board[i][j] = 0;
-                    }
+    public static int evaluate(CardMatrixPane cardMatrixPane) {
+        int[][] board = new int[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (cardMatrixPane.getCps()[i][j] != null) {
+                    board[i][j] = cardMatrixPane.getCps()[i][j].getNumber();
+                } else {
+                    board[i][j] = 0;
                 }
             }
-            int maxScore = Integer.MIN_VALUE;
-            // 遍历每种阵型
-            for (int[][] weightMatrix : weightMatrices) {
-                // 对局面进行旋转和翻转得到8个方向
-                for (int k = 0; k < 4; k++) {
-                    int score = calculateDirectionScore(board, weightMatrix);
-                    maxScore = Math.max(maxScore, score);
-                    board = rotateAndFlip(board);
-                }
+        }
+        int maxScore = Integer.MIN_VALUE;
+        // 遍历每种阵型
+        for (int[][] weightMatrix : weightMatrices) {
+            // 对局面进行旋转和翻转得到8个方向
+            for (int k = 0; k < 4; k++) {
+                int score = calculateDirectionScore(board, weightMatrix);
+                maxScore = Math.max(maxScore, score);
+                board = rotateAndFlip(board);
             }
-
-            return maxScore;
         }
 
-        // 计算某个方向上的得分
-        private static int calculateDirectionScore(int[][] board, int[][] weightMatrix) {
-            int score = 0;
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    score += board[i][j] * weightMatrix[i][j];
-                }
-            }
-            return score;
-        }
-
-        // 将局面进行旋转和翻转
-        private static int[][] rotateAndFlip(int[][] board) {
-            int[][] result = new int[4][4];
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    result[i][j] = board[3 - j][i];
-                }
-            }
-            return result;
-        }
+        return maxScore;
     }
+
+    // 计算某个方向上的得分
+    private static int calculateDirectionScore(int[][] board, int[][] weightMatrix) {
+        int score = 0;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                score += board[i][j] * weightMatrix[i][j];
+            }
+        }
+        return score;
+    }
+
+    // 将局面进行旋转和翻转
+    private static int[][] rotateAndFlip(int[][] board) {
+        int[][] result = new int[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result[i][j] = board[3 - j][i];
+            }
+        }
+        return result;
+    }
+}
 
 
 
