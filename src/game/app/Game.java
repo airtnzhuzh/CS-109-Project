@@ -9,11 +9,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * 2048运行类
@@ -26,12 +29,21 @@ public class Game implements GameCallbacks {
 	private String username;
 
 	private GameAIMenu gameAIMenu;
+	private Stage loginStage;
 
 	private DirectionMenu directionMenu;
+	private Stage stage;
+	private Background background1;
+	private Background background2;
+	private Background background3;
+	private Background background4;
+
+
 	
-	public Game(Application app, String username) {
-		Stage stage = new Stage();
+	public Game(Application app, String username,Stage loginStage) {
+		stage = new Stage();
 		this.username = username;
+		this.loginStage = loginStage;
 
 		borderPane=new BorderPane();
 		Scene scene=new Scene(borderPane,1000,600);
@@ -39,6 +51,7 @@ public class Game implements GameCallbacks {
 		//Top菜单栏
 		menuBar=new GameMenuBar(this);//创建菜单栏,并传入Application供调用
 		borderPane.setTop(menuBar);//顶部
+
 
 
 
@@ -51,10 +64,53 @@ public class Game implements GameCallbacks {
 		cardMatrixPane.setPadding(new Insets(5,5,5,5));//外边距
 		borderPane.setCenter(cardMatrixPane);//中心
 
-		//右上角增加GameAIMenu
+		//左上角增加GameAIMenu
 		gameAIMenu =new GameAIMenu(cardMatrixPane);
 		borderPane.setLeft(gameAIMenu.getLayout());
 		borderPane.setPadding(new Insets(5,5,5,5));
+
+		// 加载背景图片
+		Image backgroundImage1 = new Image("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\background01.png"); // 替换为您图片的路径
+		Image backgroundImage2 = new Image("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\background02.png");
+		Image backgroundImage3 = new Image("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\background03.png");
+		Image backgroundImage4 = new Image("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\background04.gif");
+		// 创建背景图像对象
+		BackgroundImage backgroundImg1 = new BackgroundImage(
+				backgroundImage1,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT,
+				BackgroundSize.DEFAULT);
+		BackgroundImage backgroundImg2 = new BackgroundImage(
+				backgroundImage2,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT,
+				BackgroundSize.DEFAULT);
+		BackgroundImage backgroundImg3 = new BackgroundImage(
+				backgroundImage3,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT,
+				BackgroundSize.DEFAULT);
+		BackgroundImage backgroundImg4 = new BackgroundImage(
+				backgroundImage4,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundRepeat.NO_REPEAT,
+				BackgroundPosition.DEFAULT,
+				new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true));
+
+		// 创建背景对象
+		background1 = new Background(backgroundImg1);
+		background2 = new Background(backgroundImg2);
+		background3 = new Background(backgroundImg3);
+		background4 = new Background(backgroundImg4);
+
+
+		borderPane.setBackground(background1);
+
+
+
 
 		//Right方向按钮
 		directionMenu = new DirectionMenu(cardMatrixPane);
@@ -76,11 +132,21 @@ public class Game implements GameCallbacks {
 //		startGame();
 //		cardMatrixPane.testColors();//颜色测试
 	}
-	/*
-	public static void main(String[] args) {
-		Application.launch(args);
-	}*/
-	
+	public void setBackground(int i){
+		if(i == 0) {
+			borderPane.setBackground(background1);
+		}
+		if(i == 1) {
+			borderPane.setBackground(background2);
+		}
+		if(i == 2) {
+			borderPane.setBackground(background3);
+		}
+		if(i == 3) {
+			borderPane.setBackground(background4);
+		}
+
+	}
 	/**开始游戏*/
 	public void startGame() {
 		cardMatrixPane.requestFocus();//添加焦点
@@ -95,6 +161,19 @@ public class Game implements GameCallbacks {
 	@Override
 	public void afterRestart() {
 		cardMatrixPane.restartMatrix();
+	}
+
+	@Override
+	public void logout() {
+		if(username!= null){
+			try {
+				new GameSaver(username).save(cardMatrixPane);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		stage.close();
+		loginStage.show();
 	}
  
 	@Override
@@ -153,13 +232,31 @@ public class Game implements GameCallbacks {
 			alert.show();
 		}
 	}
-	
+
 	@Override
 	public void getPastRecords() {
-		menuBar.getScoreMenu().setText("分数: "+cardMatrixPane.getScore());
+		List<String> record=null;
+		try {
+			record = cardMatrixPane.getRecord();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
 		Alert alert=new Alert(AlertType.INFORMATION);
 		alert.setTitle(alert.getAlertType().toString());
-		alert.setContentText("还没有制作喵");
+		if (record != null) {
+			int i=1;
+			StringBuffer sb = new StringBuffer();
+			for (String str : record) {
+				sb.append(i +"、"+ str + "\n");
+				i++;
+				if (i==21){
+					break;
+				}
+			}
+			alert.setContentText(sb.toString());
+		}else {
+			alert.setContentText("还没有历史得分哦");
+		}
 		alert.show();
 	}
 }

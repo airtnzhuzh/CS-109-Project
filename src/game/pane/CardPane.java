@@ -54,7 +54,17 @@ public class CardPane extends BorderPane {
 		setCenter(l);
 		//绘制变化的部分
 		this.draw();
+
+		r.getParent().requestFocus();;
+		r.setOnMouseClicked(event->{
+			setType(0);
+			this.draw();
+			if (getParent() instanceof Pane) System.out.println("OK");
+			getParent().setMouseTransparent(true);
+		});
 	}
+
+
 	
 	/**获取数字标签对象*/
 	public Label getLabel() {
@@ -166,7 +176,5 @@ public class CardPane extends BorderPane {
 	public String toString() {
 		return "[type="+type+", merge="+merge+"]";
 	}
-
-
 
 }

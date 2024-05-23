@@ -7,10 +7,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Optional;
 
 // 这是一个用于处理按钮点击事件的外部类
 
@@ -56,10 +60,23 @@ private  VBox menu;
             cardMatrixPane.afterAction();
             } // After action logic
             if(cardMatrixPane.isGameOver()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
-                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                alert.show();
+                alert.setHeaderText(null);
+                alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                ButtonType buttonTypeYes = new ButtonType("是");
+                ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == buttonTypeYes) {
+                    cardMatrixPane.restartMatrix();
+                } else {
+                    // Close the alert
+                    alert.close();
+                }
             }
         });
 
@@ -71,10 +88,23 @@ private  VBox menu;
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
-                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                alert.show();
+                alert.setHeaderText(null);
+                alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                ButtonType buttonTypeYes = new ButtonType("是");
+                ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == buttonTypeYes) {
+                    cardMatrixPane.restartMatrix();
+                } else {
+                    // Close the alert
+                    alert.close();
+                }
             }
         });
 
@@ -86,10 +116,23 @@ private  VBox menu;
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
-                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                alert.show();
+                alert.setHeaderText(null);
+                alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                ButtonType buttonTypeYes = new ButtonType("是");
+                ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == buttonTypeYes) {
+                    cardMatrixPane.restartMatrix();
+                } else {
+                    // Close the alert
+                    alert.close();
+                }
             }
         });
 
@@ -101,10 +144,23 @@ private  VBox menu;
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
-                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                alert.show();
+                alert.setHeaderText(null);
+                alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                ButtonType buttonTypeYes = new ButtonType("是");
+                ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == buttonTypeYes) {
+                    cardMatrixPane.restartMatrix();
+                } else {
+                    // Close the alert
+                    alert.close();
+                }
             }
         });
         // 设置事件处理程序

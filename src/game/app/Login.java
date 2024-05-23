@@ -85,7 +85,7 @@ public class Login extends Application{
             try {
                 if (UserAuth.login(name, password)){
                     primaryStage.close();
-                    new Game(this,name).startGame();
+                    new Game(this,name,primaryStage).startGame();
                     Success success = new Success("登录");
                 }else{
                     primaryStage.setTitle("账号或者密码错误");
@@ -108,7 +108,7 @@ public class Login extends Application{
 
         guest.setOnAction(event -> {
             primaryStage.close();
-            new Game(this,null).startGame();
+            new Game(this,null,primaryStage).startGame();
         });
     }
 }

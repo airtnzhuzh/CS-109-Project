@@ -1,18 +1,24 @@
 package edu.sustech.game.pane;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import edu.sustech.game.app.Game;
 import edu.sustech.game.config.GameSaver;
 import javafx.animation.*;
 import javafx.scene.control.Alert;
 
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
+
+import javax.tools.Tool;
 
 /**
  * 卡片矩阵
@@ -25,10 +31,15 @@ public class CardMatrixPane extends StackPane {
     private GridPane gridPane;//卡片矩阵容器
     private CardPane[][] cps;//卡片矩阵
     private long score = 0;//分数,初始为0
+    private List<String> record = new ArrayList<>();//记录
+    private int usecount;
+
+
 
 
     private Game game;
     private GameSaver gs;
+
 
 
     private boolean keyProcessed = false;//键是否已经处理
@@ -40,50 +51,63 @@ public class CardMatrixPane extends StackPane {
     }
 
     public CardMatrixPane(Game game, boolean newGame) {
-        mCallbacks = (GameCallbacks) game;
+
+
+        mCallbacks=(GameCallbacks)game;
+        gs = new GameSaver(game.getUsername());
         this.game = game;
         if (newGame) {
-            this.cols = 4;
-            this.rows = 4;
+            this.cols=4;
+            this.rows=4;
 
             init();
-        } else {
+        }else {
             try {
-                gs = new GameSaver(game.getUsername());
                 Map<String, Object> map = gs.getCardPane();
-                if (map != null && map.get("cols") != null && map.get("rows") != null
+                if (map != null && map.get("cols") != null &&  map.get("rows") != null
                         && map.get("cardPane") != null) {
-                    this.cols = (int) map.get("cols");
+                    this.cols = (int)map.get("cols");
                     this.rows = (int) map.get("rows");
-                    cps = (CardPane[][]) map.get("cardPane");
+                    cps = (CardPane[][])map.get("cardPane");
                 }
 
                 Map<String, Object> sc = gs.getScoreAndQuantities();
                 if (sc != null) {
-                    score = ((Long) sc.get("score")).longValue();
-                    mcQuantities = (int[]) sc.get("quantities");
+                    usecount = ((Integer)sc.get("usecount")).intValue();
+                    score = ((Long)sc.get("score")).longValue();
+                    mcQuantities = (int[])sc.get("quantities");
                 }
 
+                record = gs.getRecord();
+
+
                 resumeGridPane();
-            } catch (Exception ex) {
+            }catch(Exception ex) {
                 ex.printStackTrace();
                 //异常时新开游戏
+                this.cols=4;
+                this.rows=4;
                 init();
+                Alert alert=new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("存档读取异常，已重置游戏");
+                alert.show();
             }
-
         }
-
         getChildren().add(gridPane);
+        gridPane.setMouseTransparent(true);
     }
 
     public CardMatrixPane(int cols, int rows, Game game) {//application供回调方法使用
-        mCallbacks = (GameCallbacks) game;
-        this.cols = cols;
-        this.rows = rows;
+
+        mCallbacks=(GameCallbacks)game;
+        gs = new GameSaver(game.getUsername());
+        this.cols=cols;
+        this.rows=rows;
         this.game = game;
-//		this.setBackground(new Background(new BackgroundFill(Color.BLUE,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
+//     this.setBackground(new Background(new BackgroundFill(Color.BLUE,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
         init();
         getChildren().add(gridPane);
+        gridPane.setMouseTransparent(true);
     }
 
     /**
@@ -116,6 +140,14 @@ public class CardMatrixPane extends StackPane {
         return mcQuantities;
     }
 
+    public void setUsecount(int usecount){
+        this.usecount=usecount;
+    }
+
+    public int getUsecount(){
+        return usecount;
+    }
+
     private void init() {
         initGridPane();//初始化GridPane
         createRandomNumber();//在随机的空卡片上生成数字,这个方法会返回布尔值,但这里不需要
@@ -125,6 +157,7 @@ public class CardMatrixPane extends StackPane {
      * 初始化GridPane
      */
     private void initGridPane() {
+        setUsecount(0);
         gridPane = new GridPane();
 //		gridPane.setBackground(new Background(new BackgroundFill(Color.YELLOW,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
 //		gridPane.setGridLinesVisible(true);//单元格边框可见,测试用
@@ -239,10 +272,24 @@ public class CardMatrixPane extends StackPane {
                     if(testUp()) {goUp();//↑
                     afterAction();}
                     if(isGameOver()){
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
-                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                        alert.show();
+                        alert.setHeaderText(null);
+                        alert.setContentText("游戏结束，本次最大数字为 " + getMaxCard().getNumber() + "，是否重新开始？");
+
+                        ButtonType buttonTypeYes = new ButtonType("是");
+                        ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.isPresent() && result.get() == buttonTypeYes) {
+                            restartMatrix();
+                        } else {
+                            // Close the alert
+                            alert.close();
+                        }
+
                     }
                     break;
                 case DOWN:
@@ -250,10 +297,23 @@ public class CardMatrixPane extends StackPane {
                     if(testDown()){goDown();//↓
                     afterAction();}
                     if(isGameOver()){
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
-                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                        alert.show();
+                        alert.setHeaderText(null);
+                        alert.setContentText("游戏结束，本次最大数字为 " + getMaxCard().getNumber() + "，是否重新开始？");
+
+                        ButtonType buttonTypeYes = new ButtonType("是");
+                        ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.isPresent() && result.get() == buttonTypeYes) {
+                            restartMatrix();
+                        } else {
+                            // Close the alert
+                            alert.close();
+                        }
                     }
                     break;
                 case LEFT:
@@ -261,10 +321,23 @@ public class CardMatrixPane extends StackPane {
                     if(testLeft()) {goLeft();//←
                     afterAction();}
                     if(isGameOver()){
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
-                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                        alert.show();
+                        alert.setHeaderText(null);
+                        alert.setContentText("游戏结束，本次最大数字为 " + getMaxCard().getNumber() + "，是否重新开始？");
+
+                        ButtonType buttonTypeYes = new ButtonType("是");
+                        ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.isPresent() && result.get() == buttonTypeYes) {
+                            restartMatrix();
+                        } else {
+                            // Close the alert
+                            alert.close();
+                        }
                     }
                     break;
                 case RIGHT:
@@ -272,10 +345,23 @@ public class CardMatrixPane extends StackPane {
                     if(testRight()) {goRight();//→
                     afterAction();}
                     if(isGameOver()){
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
-                        alert.setContentText("游戏结束,本次最大数字为" + getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                        alert.show();
+                        alert.setHeaderText(null);
+                        alert.setContentText("游戏结束，本次最大数字为 " + getMaxCard().getNumber() + "，是否重新开始？");
+
+                        ButtonType buttonTypeYes = new ButtonType("是");
+                        ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.isPresent() && result.get() == buttonTypeYes) {
+                            restartMatrix();
+                        } else {
+                            // Close the alert
+                            alert.close();
+                        }
                     }
                     break;
                 default:
@@ -787,13 +873,19 @@ public class CardMatrixPane extends StackPane {
      * 重启卡片矩阵,并在随机的空卡片上生成数字
      */
     public void restartMatrix() {
-        for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
-            for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
-                CardPane card = cps[i][j];
+        try {
+            gs.saveRecord(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(int i=0;i<cols;i++) {//遍历卡片矩阵的列
+            for(int j=0;j<rows;j++) {//遍历卡片矩阵的行
+                CardPane card=cps[i][j];
                 card.setType(0);
                 card.draw();//重绘
             }
         }
+        usecount=0;
         score = 0;//重设分数
         mcQuantities = new int[15];//重设合并过的卡片数字数量
         mCallbacks.afterScoreChange();
@@ -902,6 +994,8 @@ public class CardMatrixPane extends StackPane {
         return boardString.toString();
     }
 
-
+    public List<String> getRecord() {
+        return record;
+    }
 }
 

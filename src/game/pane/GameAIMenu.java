@@ -3,10 +3,15 @@ package edu.sustech.game.pane;
 import edu.sustech.game.app.Game;
 import edu.sustech.game.control.GameAI;
 import javafx.animation.AnimationTimer;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.util.Optional;
 
 
 public class GameAIMenu extends Pane {
@@ -17,6 +22,7 @@ public class GameAIMenu extends Pane {
     private Button AllStepsButton;
     private Button OneStepButton;
     private GameAI gameAI;
+    private ToolMenu toolMenu;
 
 
     // instance variable
@@ -31,6 +37,9 @@ public class GameAIMenu extends Pane {
         //创建按钮
         OneStepButton = new Button("AI推荐");
         AllStepsButton = new Button("电脑托管");
+        //Tool按钮
+        toolMenu = new ToolMenu(cardMatrixPane);
+
 
         //调整尺寸
         OneStepButton.setMinSize(80, 80);
@@ -38,7 +47,7 @@ public class GameAIMenu extends Pane {
 
         //初始化VBox布局
 
-        VBox verticalButtons = new VBox(10, OneStepButton, AllStepsButton); // 上、下排列
+        VBox verticalButtons = new VBox(10, OneStepButton, AllStepsButton,toolMenu.getLayout()); // 上、下排列
         menu = verticalButtons;
 
 
@@ -47,10 +56,23 @@ public class GameAIMenu extends Pane {
             cardMatrixPane.beforeAction(); // Before action logic
             gameAI.move(cardMatrixPane);       // Main action logic
             if(cardMatrixPane.isGameOver()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
-                alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                alert.show();
+                alert.setHeaderText(null);
+                alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                ButtonType buttonTypeYes = new ButtonType("是");
+                ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == buttonTypeYes) {
+                    cardMatrixPane.restartMatrix();
+                } else {
+                    // Close the alert
+                    alert.close();
+                }
             } // After action logic
         });
 
@@ -90,10 +112,23 @@ public class GameAIMenu extends Pane {
                     AllStepsButton.setStyle("-fx-background-color: #ffffff");
                     AllStepsButton.setText("电脑托管");
                     this.stop();
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle(alert.getAlertType().toString());
-                    alert.setContentText("游戏结束,本次最大数字为" + cardMatrixPane.getMaxCard().getNumber() + ",可在菜单栏选择重新开始\n");
-                    alert.show();
+                    alert.setHeaderText(null);
+                    alert.setContentText("游戏结束，本次最大数字为 " + cardMatrixPane.getMaxCard().getNumber() + "，是否重新开始？");
+
+                    ButtonType buttonTypeYes = new ButtonType("是");
+                    ButtonType buttonTypeNo = new ButtonType("否", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                    alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == buttonTypeYes) {
+                        cardMatrixPane.restartMatrix();
+                    } else {
+                        // Close the alert
+                        alert.close();
+                    }
                 }
 
                 aiProcessed = false;

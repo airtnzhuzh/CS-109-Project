@@ -244,6 +244,7 @@ public class GameAI {
         if (MaxDOWN == MaxLEFT && MaxDOWN == MaxRIGHT && MaxDOWN > MaxUP) {
             return value._UP;
         }
+        System.out.println("null");
 
 
         return value.NULL;
@@ -568,7 +569,8 @@ public class GameAI {
                 }
             }
 
-        } else if (bestMove == value.ALL) {
+        }
+        else if (bestMove == value.ALL) {
             //四分之一概率
             Random random = new Random();
             int i = random.nextInt(4);

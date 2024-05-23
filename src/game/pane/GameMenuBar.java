@@ -28,11 +28,12 @@ public class GameMenuBar extends MenuBar {
 		restartMenuItem.setOnAction(e->mCallbacks.afterRestart());
 		MenuItem saveMenuItem=new MenuItem("保存");//保存
 		saveMenuItem.setOnAction(e->mCallbacks.save());
-		MenuItem exitMenuItem=new MenuItem("退出");//退出
+		MenuItem logoutMenuItem=new MenuItem("切换账号");//切换账号
+		logoutMenuItem.setOnAction(e->mCallbacks.logout() );
+		MenuItem exitMenuItem=new MenuItem("关闭游戏");//关闭游戏
 		exitMenuItem.setOnAction(e->mCallbacks.save());
-
 		exitMenuItem.setOnAction(e->Platform.exit());
-		gameMenu.getItems().addAll(restartMenuItem,saveMenuItem,exitMenuItem);
+		gameMenu.getItems().addAll(restartMenuItem,saveMenuItem,logoutMenuItem,exitMenuItem);
 		
 		//Setting菜单
 		Menu settingMenu=new Menu("设置");//设置
@@ -74,6 +75,23 @@ public class GameMenuBar extends MenuBar {
 		MenuItem historyScoreMenuItem=new MenuItem("历史分数");//历史分数
 		historyScoreMenuItem.setOnAction(e->mCallbacks.getPastRecords());
 		recordMenu.getItems().addAll(historyScoreMenuItem);
+
+		//Backgroud菜单
+		Menu backgroundMenu=new Menu("背景");//背景
+		// Create menu items with different backgrounds
+		MenuItem backgroundItem1 = new MenuItem("白色简约");
+		MenuItem backgroundItem2 = new MenuItem("木质经典");
+		MenuItem backgroundItem3 = new MenuItem("条纹色彩");
+		MenuItem backgroundItem4 = new MenuItem("流星动感");
+
+
+		// Add event handlers to menu items
+		backgroundItem1.setOnAction(e -> game.setBackground(0));
+		backgroundItem2.setOnAction(e -> game.setBackground(1));
+		backgroundItem3.setOnAction(e -> game.setBackground(2));
+		backgroundItem4.setOnAction(e -> game.setBackground(3));
+		backgroundMenu.getItems().addAll(backgroundItem1, backgroundItem2, backgroundItem3, backgroundItem4);
+
 		
 		//Score菜单
 		scoreMenu=new Menu("分数");//分数
@@ -81,7 +99,7 @@ public class GameMenuBar extends MenuBar {
 		moreScoreInfo.setOnAction(e->mCallbacks.afterGetMoreScoreInfo());
 		scoreMenu.getItems().addAll(moreScoreInfo);
 		
-		getMenus().addAll(gameMenu,settingMenu,infoMenu,recordMenu,scoreMenu);
+		getMenus().addAll(gameMenu,settingMenu,infoMenu,recordMenu,scoreMenu,backgroundMenu);
 	}
 	
 	/**获取分数菜单*/

@@ -35,4 +35,6 @@ public interface GameCallbacks {
 	 * 获取历史记录
 	 */
 	public void getPastRecords();
+
+	public void logout();
 }
