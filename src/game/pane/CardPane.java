@@ -3,6 +3,7 @@ package edu.sustech.game.pane;
 import edu.sustech.game.config.CardColor;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +12,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.w3c.dom.ls.LSOutput;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 数字卡片
@@ -65,7 +69,12 @@ public class CardPane extends BorderPane {
 			setType(0);
 			this.draw();
 			getParent().setMouseTransparent(true);
+
+
 		});
+
+
+
 	}
 
 
@@ -98,12 +107,42 @@ public class CardPane extends BorderPane {
 	/**绘制单次操作中卡片变化的部分,包括颜色和显示的数字*/
 	public void draw() {
 		if(merge) {//突出显示已合并的卡片
-     ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(80), r);
-     scaleTransition.setToX(1.2f);
-     scaleTransition.setToY(1.2f);
-     scaleTransition.setCycleCount(2);
-     scaleTransition.setAutoReverse(true);
-     scaleTransition.play();
+//     ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(50), r);
+//     scaleTransition.setToX(1.2f);
+//     scaleTransition.setToY(1.2f);
+//     scaleTransition.setCycleCount(2);
+//     scaleTransition.setAutoReverse(true);
+//	 scaleTransition.play();
+
+
+			r.setStroke(Color.RED);//此次操作中合并,显示红色
+		}else {
+			r.setStroke(Color.BLACK);//此次操作中没有合并,显示黑色
+		}
+
+
+
+		if(girdStyle==0) {
+			r.setFill(CardColor.CB[type]);
+
+		}
+		else if(girdStyle==1){
+			r.setFill(CardColor.FORESTCB[type]);
+
+		}
+		else if(girdStyle==2){
+			r.setFill(CardColor.OCEANCB[type]);
+		}
+		else{
+			r.setFill(CardColor.DARKCB[type]);
+		}
+		drawNumber();
+
+	}
+
+
+	public void draw2() {
+		if(merge) {//突出显示已合并的卡片
 			r.setStroke(Color.RED);//此次操作中合并,显示红色
 		}else {
 			r.setStroke(Color.BLACK);//此次操作中没有合并,显示黑色

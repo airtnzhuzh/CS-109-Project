@@ -88,6 +88,7 @@ public class CardMatrixPane extends StackPane {
 
                 resumeGridPane();
 
+
                 if (aiuse!=0){
                     //用Timer等待1.5秒
                     Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), ev -> {
@@ -913,7 +914,7 @@ public class CardMatrixPane extends StackPane {
         int voidCardIndex = (int) (Math.random() * len);
         CardPane card = voidCards.get(voidCardIndex);
         card.setType(type);//更新type,生成数字
-        card.draw();//重绘此卡片
+        card.draw2();//重绘此卡片
         if (len == 1) {//只有一个空卡片,矩阵生成数字后满
             return false;
         }

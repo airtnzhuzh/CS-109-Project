@@ -4,10 +4,14 @@ aegis 21360
 barbatos 6896
 null 3128
 aegis 3076
+null 2980
 aegis 2308
+null 2284
 aegis 2048
 null 1912
+null 1384
 null 1300
+123 1284
 aegis 1252
 null 1160
 aegis 1004
@@ -19,6 +23,8 @@ aegis 672
 aegis 660
 null 632
 null 616
+null 564
+123 404
 aegis 400
 aegis 372
 aegis 312
@@ -27,6 +33,7 @@ aegis 180
 aegis 144
 aegis 132
 null 76
+null 64
 aegis 56
 aegis 52
 123 44
@@ -44,4 +51,5 @@ null 0
 null 0
 null 0
 null 0
+123 0
 123 0

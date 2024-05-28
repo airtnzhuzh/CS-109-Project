@@ -44,9 +44,7 @@ public class FileUtil {
 		String hashString = generateChecksum(file);
 		String hashFileToString = fileToString(hashFilePath);
 		
-		System.out.println(hashString);
-		System.out.println("==============================");
-		System.out.println(hashFileToString);
+
 		
 		if (hashString.equals(hashFileToString)) {
 			return false;
