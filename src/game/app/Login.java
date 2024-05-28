@@ -10,8 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -49,7 +49,18 @@ public class Login extends Application{
         guest.setPrefWidth(170);
 
         GridPane gr=new GridPane();
-        gr.setStyle("-fx-background-color: #FFF0F5");
+
+        Image loginBackgroundImage = new Image("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\LoginBackground2.png");
+        // 创建背景图像对象
+        BackgroundImage loginBackground = new BackgroundImage(
+                loginBackgroundImage,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT);
+
+        Background background = new Background(loginBackground);
+        gr.setBackground(background);
 
         gr.add(l_name,0,8);
         gr.add(t_name,1,8);
@@ -70,8 +81,11 @@ public class Login extends Application{
         Scene scene = new Scene(gr);
         primaryStage.setScene(scene);
         primaryStage.setTitle("登录");
-        primaryStage.setWidth(450);
-        primaryStage.setHeight(650);
+        primaryStage.setWidth(650);
+        primaryStage.setHeight(680);
+
+
+
         primaryStage.setResizable(false);
         primaryStage.show();
 

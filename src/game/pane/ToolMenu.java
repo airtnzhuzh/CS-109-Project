@@ -169,7 +169,7 @@ public class ToolMenu extends Pane {
                 // 更新倒计时文本
                 javafx.application.Platform.runLater(() -> {
                     ((BorderPane) stage.getScene().getRoot()).getTop().setVisible(true);
-                    ((Text) ((BorderPane) stage.getScene().getRoot()).getTop()).setText("倒计时 " + (count-2) + " 秒钟");
+                    ((Text) ((BorderPane) stage.getScene().getRoot()).getTop()).setText("观看完毕获得奖励倒计时    " + (count-2) + " 秒钟");
                 });
             }
             cardMatrixPane.setUsecount(cardMatrixPane.getUsecount() + 2);

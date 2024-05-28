@@ -1086,7 +1086,7 @@ public class CardMatrixPane extends StackPane {
 
     public void soundeffect(int i){
         try {
-            AudioInputStream audioInputStream1= AudioSystem.getAudioInputStream(new File("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\soundeffect2.wav"));
+            AudioInputStream audioInputStream1= AudioSystem.getAudioInputStream(new File("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\soundeffect1.wav"));
             AudioInputStream audioInputStream2= AudioSystem.getAudioInputStream(new File("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\soundeffect2.wav"));
             Clip clip = AudioSystem.getClip();
             if (i==1) {

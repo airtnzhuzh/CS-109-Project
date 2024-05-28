@@ -4,10 +4,7 @@ import edu.sustech.game.app.Game;
 import edu.sustech.game.control.GameAI;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -96,6 +93,8 @@ public class GameAIMenu extends Pane {
         //设置内边距
         OneStepButton.setPadding(new Insets(10, 10, 10, 10));
         AllStepsButton.setPadding(new Insets(10, 10, 10, 10));
+        OneStepButton.setTooltip(new Tooltip("使用AI分数清零"));
+        AllStepsButton.setTooltip(new Tooltip("使用AI分数清零"));
 
 
 
