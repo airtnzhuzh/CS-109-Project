@@ -3,13 +3,16 @@ package edu.sustech.game.pane;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -28,9 +31,30 @@ public class ToolMenu extends Pane {
     public ToolMenu(CardMatrixPane cardMatrixPane) {
         this.cardMatrixPane = cardMatrixPane;
 
+
+
+
         // 创建按钮
         removeButton = new Button("清除方块"+"\n"+"次数：" + cardMatrixPane.getUsecount());
         Button guangGao = new Button("观看广告\n获得道具次数");
+        removeButton.setMinSize(80, 80);
+        guangGao.setMinSize(80, 80);
+
+        removeButton.prefWidthProperty().bind(cardMatrixPane.widthProperty().divide(6));
+        removeButton.prefHeightProperty().bind(cardMatrixPane.heightProperty().divide(10));
+        guangGao.prefWidthProperty().bind(cardMatrixPane.widthProperty().divide(6));
+        guangGao.prefHeightProperty().bind(cardMatrixPane.heightProperty().divide(10));
+        removeButton.setStyle("-fx-background-color: #859FC8;-fx-font-size:15");
+        guangGao.setStyle("-fx-background-color: #637DAD;-fx-font-size:13");
+
+        // 添加阴影效果
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(5);
+        dropShadow.setOffsetX(3);
+        dropShadow.setOffsetY(3);
+        dropShadow.setColor(Color.GRAY);
+        removeButton.setEffect(dropShadow);
+        guangGao.setEffect(dropShadow);
 
 
 
@@ -64,10 +88,20 @@ public class ToolMenu extends Pane {
                 });
             }
         }, 0, 1000); // 每秒钟刷新一次
+
+
+
+
+
+
+
     }
     public void updateRemoveButtonText() {
         removeButton.setText("清除方块"+"\n"+"次数：" + cardMatrixPane.getUsecount());
     }
+
+
+
 
 
     public VBox getLayout() {

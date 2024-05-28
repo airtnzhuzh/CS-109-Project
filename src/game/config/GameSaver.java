@@ -1,9 +1,6 @@
 package edu.sustech.game.config;
 
 import java.io.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +8,16 @@ import java.util.Map;
 
 import edu.sustech.game.pane.CardMatrixPane;
 import edu.sustech.game.pane.CardPane;
-import edu.sustech.game.util.FileUtil;
+import edu.sustech.util.FileUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
+import javafx.util.Duration;
 
-import static edu.sustech.game.util.FileUtil.generateChecksum;
-import static edu.sustech.game.util.FileUtil.isModified;
+import static edu.sustech.util.FileUtil.isModified;
 import static java.lang.String.valueOf;
-import static java.time.LocalTime.MIN;
+
 
 public class GameSaver {
 	private static String progressFilePrefix = "C:\\Users\\zhuzh\\IdeaProjects\\Project\\data\\progress";
@@ -152,6 +151,13 @@ public class GameSaver {
 			File hashFile = new File(progressFileHash);
 			if (isModified(file, progressFileHash)) {
 				throw new IOException("进度文件被篡改");
+//				Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), ev -> {
+//				Alert alert=new Alert(Alert.AlertType.INFORMATION);
+//				alert.setTitle(alert.getAlertType().toString());
+//				alert.setContentText("进度文件被篡改");
+//				alert.show();
+//				}));
+//				timeline.play();
 			}
 			if (!file.exists()) {
 				throw new IOException("进度文件不存在");
@@ -229,6 +235,10 @@ public class GameSaver {
 			bw = new BufferedWriter(fw);
 			bw.write(valueOf(cardMatrixPane.getUsecount()));
 			bw.newLine();
+			bw.write(valueOf(cardMatrixPane.getAiuse()));
+			bw.newLine();
+			bw.write(valueOf(cardMatrixPane.getStep()));
+			bw.newLine();
 			bw.write(valueOf(cardMatrixPane.getScore()));
 
 			int[] quantities = cardMatrixPane.getMcQuantities();
@@ -265,6 +275,7 @@ public class GameSaver {
 			File hashFile = new File(scoreFileHash);
 			if (isModified(file, scoreFileHash)) {
 				throw new IOException("得分文件被篡改");
+
 			}
 			if (!file.exists()) {
 				throw new IOException("得分文件不存在");
@@ -283,14 +294,26 @@ public class GameSaver {
 					}
 					map.put("usecount", usecount);
 				} else if (i == 1) {
-					Long score = Long.valueOf(line);//读取第二行数字
+					int aiuse = Integer.valueOf(line);//读取第二行数字
+					if (aiuse < 0) {
+						throw new IOException("数字有负数");
+					}
+					map.put("aiuse", aiuse);
+				} else if (i == 2) {
+					int step = Integer.valueOf(line);//读取第四行数字
+					if (step < 0) {
+						throw new IOException("数字有负数");
+					}
+					map.put("step", step);
+				}else if (i == 3) {
+					Long score = Long.valueOf(line);//读取第三行数字
 					if (score.longValue() < 0) {
 						throw new IOException("数字有负数");
 					}
 					map.put("score", score);
-				}else if(i>1){
-					qty[i-2] = Integer.valueOf(line).intValue();
-					if (qty[i-2] < 0 || (i > 2 && qty[i-3] < qty[i-2]))
+				}else if(i>3){
+					qty[i-4] = Integer.valueOf(line).intValue();
+					if (qty[i-4] < 0 || (i > 4 && qty[i-5] < qty[i-4]))
 						throw new IOException("得分数字不符合要求");
 				}
 				i++;
@@ -306,7 +329,7 @@ public class GameSaver {
 			if (fr != null) fr.close();
 		}
 
-		if (i !=17) {
+		if (i !=19) {
 			throw new IOException("得分文件行数不对");
 		}
 

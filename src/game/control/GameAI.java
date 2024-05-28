@@ -99,6 +99,7 @@ public class GameAI {
         CardMatrixPane cardMatrixPane = cardMatrixPaneOrigin.clone();
         if (depth == 0) {
             EvaluationFunction.evaluate(cardMatrixPane);
+            System.out.println( EvaluationFunction.evaluate(cardMatrixPane));
         }
         if (direction == value.UP) {
             cardMatrixPane.beforeAction2();

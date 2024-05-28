@@ -8,8 +8,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.Optional;
 
@@ -24,6 +27,9 @@ public class GameAIMenu extends Pane {
     private GameAI gameAI;
     private ToolMenu toolMenu;
 
+    private Button soundButton;
+    boolean soundEnabled = false;
+
 
     // instance variable
     private long previousTimestamp ;
@@ -37,24 +43,84 @@ public class GameAIMenu extends Pane {
         //创建按钮
         OneStepButton = new Button("AI推荐");
         AllStepsButton = new Button("电脑托管");
+        OneStepButton.setStyle("-fx-background-color: #BFD6F7;-fx-font-size:15");
+        AllStepsButton.setStyle("-fx-background-color: #A8C0E4;-fx-font-size:15");
         //Tool按钮
         toolMenu = new ToolMenu(cardMatrixPane);
 
+        soundButton = new Button("音效关闭");
+        soundButton.setStyle("-fx-background-color: #404f6c;-fx-font-size:15");
 
-        //调整尺寸
+        // 添加阴影效果
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(5);
+        dropShadow.setOffsetX(3);
+        dropShadow.setOffsetY(3);
+        dropShadow.setColor(Color.GRAY);
+        soundButton.setEffect(dropShadow);
+        AllStepsButton.setEffect(dropShadow);
+        OneStepButton.setEffect(dropShadow);
+
+
+        soundButton.setOnAction(e -> {
+            if(soundEnabled) {
+                soundEnabled = !soundEnabled;
+                soundButton.setStyle("-fx-background-color: #404f6c;-fx-font-size:15");
+                soundButton.setText("音效关闭");
+                cardMatrixPane.requestFocus();
+            }
+            else{
+                soundEnabled = !soundEnabled;
+                soundButton.setStyle("-fx-background-color: #c7ebc3;-fx-font-size:15");
+                soundButton.setText("音效开启");
+                cardMatrixPane.requestFocus();
+            }
+
+
+        });
+
+
+        //调整尺寸,相对尺寸
+
+
         OneStepButton.setMinSize(80, 80);
+
         AllStepsButton.setMinSize(80, 80);
+
+        //尺寸改为相对窗口的尺寸
+        OneStepButton.prefWidthProperty().bind(cardMatrixPane.widthProperty().divide(6));
+        OneStepButton.prefHeightProperty().bind(cardMatrixPane.heightProperty().divide(10));
+        AllStepsButton.prefWidthProperty().bind(cardMatrixPane.widthProperty().divide(6));
+        AllStepsButton.prefHeightProperty().bind(cardMatrixPane.heightProperty().divide(10));
+
+        //设置内边距
+        OneStepButton.setPadding(new Insets(10, 10, 10, 10));
+        AllStepsButton.setPadding(new Insets(10, 10, 10, 10));
+
+
+
+
 
         //初始化VBox布局
 
-        VBox verticalButtons = new VBox(10, OneStepButton, AllStepsButton,toolMenu.getLayout()); // 上、下排列
+        VBox verticalButtons = new VBox(10, OneStepButton, AllStepsButton,toolMenu.getLayout(),soundButton); // 上、下排列
         menu = verticalButtons;
 
 
         OneStepButton.setOnAction(e -> {
             cardMatrixPane.requestFocus();
+            if(cardMatrixPane.getGame().getCardMatrixPane().getCols() != 4 ) {
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setHeaderText(null);
+                alert.setContentText("AI推荐仅支持4*4模式");
+                alert.showAndWait();
+                return;
+            }
             cardMatrixPane.beforeAction(); // Before action logic
-            gameAI.move(cardMatrixPane);       // Main action logic
+            gameAI.move(cardMatrixPane);
+            cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
             if(cardMatrixPane.isGameOver()){
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle(alert.getAlertType().toString());
@@ -78,7 +144,17 @@ public class GameAIMenu extends Pane {
 
 
         AllStepsButton.setOnAction(e -> {
-            AllStepsButton.setStyle("-fx-background-color: #32c9a1");
+            if(cardMatrixPane.getGame().getCardMatrixPane().getCols() != 4 ) {
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(alert.getAlertType().toString());
+                alert.setHeaderText(null);
+                alert.setContentText("AI推荐仅支持4*4模式");
+                alert.showAndWait();
+                return;
+            }
+
+            AllStepsButton.setStyle("-fx-background-color: #32c9a1;-fx-font-size:15");
             AllStepsButton.setText("STOP");
             AllStepsButton();
         });
@@ -88,7 +164,6 @@ public class GameAIMenu extends Pane {
 
 
     private void AllStepsButton() {
-
         cardMatrixPane.requestFocus();
         AnimationTimer timer2 = new AnimationTimer() {
 
@@ -99,17 +174,17 @@ public class GameAIMenu extends Pane {
             public void handle(long now) {
 
                 if (aiProcessed) {
-                    System.out.println("test02");
+
                     aiProcessed = true;
                     return;
                 }
                 aiProcessed = true;
-                System.out.println(111);
-                gameAI.move(cardMatrixPane);       // Main action logic
-                System.out.println(222);
+
+                gameAI.move(cardMatrixPane);
+                cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
                 if(cardMatrixPane.isGameOver()) {// After action logic
-                    System.out.println("test03");
-                    AllStepsButton.setStyle("-fx-background-color: #ffffff");
+
+                    AllStepsButton.setStyle("-fx-background-color: #A8C0E4;-fx-font-size:15");
                     AllStepsButton.setText("电脑托管");
                     this.stop();
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -144,11 +219,11 @@ public class GameAIMenu extends Pane {
         AllStepsButton.setOnAction(event -> {
             timer2.stop();
             //event绑定回去
-            AllStepsButton.setStyle("-fx-background-color: #ffffff");
+            AllStepsButton.setStyle("-fx-background-color: #A8C0E4;-fx-font-size:15");
             AllStepsButton.setText("电脑托管");
             cardMatrixPane.requestFocus();
             AllStepsButton.setOnAction(e -> {
-                AllStepsButton.setStyle("-fx-background-color: #32c9a1");
+                AllStepsButton.setStyle("-fx-background-color: #32c9a1;-fx-font-size:15");
                 AllStepsButton.setText("STOP");
                 AllStepsButton();
             });
@@ -158,6 +233,10 @@ public class GameAIMenu extends Pane {
 
     public VBox getLayout() {
         return menu;
+    }
+
+    public boolean isSoundEnabled() {
+        return soundEnabled;
     }
 
 

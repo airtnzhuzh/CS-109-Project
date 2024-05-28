@@ -9,9 +9,14 @@ import javafx.scene.control.Button;
 
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.Optional;
@@ -36,11 +41,41 @@ private  VBox menu;
         Button leftButton = new Button("Left");
         Button rightButton = new Button("Right");
 
+        // 添加阴影效果
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setRadius(5);
+        dropShadow.setOffsetX(3);
+        dropShadow.setOffsetY(3);
+        dropShadow.setColor(Color.GRAY);
+        upButton.setEffect(dropShadow);
+        downButton.setEffect(dropShadow);
+        leftButton.setEffect(dropShadow);
+        rightButton.setEffect(dropShadow);
+
+
+
+
+
+
         // 调整尺寸
         upButton.setMinSize(80, 80);
         downButton.setMinSize(80, 80);
         leftButton.setMinSize(80, 80);
         rightButton.setMinSize(80, 80);
+
+        //设置字体大小
+        upButton.setStyle("-fx-font-size:20");
+        downButton.setStyle("-fx-font-size: 20");
+        leftButton.setStyle("-fx-font-size: 20");
+        rightButton.setStyle("-fx-font-size: 20");
+
+
+
+
+
+
+
+
 
 
 // 初始化 HBox 布局
@@ -56,7 +91,8 @@ private  VBox menu;
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
             if (cardMatrixPane.testUp())  {
-                cardMatrixPane.goUp();        // Main action logic
+                cardMatrixPane.goUp();
+                cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
             cardMatrixPane.afterAction();
             } // After action logic
             if(cardMatrixPane.isGameOver()){
@@ -84,7 +120,8 @@ private  VBox menu;
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
             if (cardMatrixPane.testDown()) {
-                cardMatrixPane.goDown();       // Main action logic
+                cardMatrixPane.goDown();
+                cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){
@@ -112,7 +149,8 @@ private  VBox menu;
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
             if (cardMatrixPane.testLeft()) {
-                cardMatrixPane.goLeft();       // Main action logic
+                cardMatrixPane.goLeft();
+                cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){
@@ -140,7 +178,8 @@ private  VBox menu;
             cardMatrixPane.requestFocus();
             cardMatrixPane.beforeAction(); // Before action logic
             if (cardMatrixPane.testRight()) {
-                cardMatrixPane.goRight();      // Main action logic
+                cardMatrixPane.goRight();
+                cardMatrixPane.setStep(cardMatrixPane.getStep()+1);// Main action logic
                 cardMatrixPane.afterAction();  // After action logic
             }
             if(cardMatrixPane.isGameOver()){

@@ -1,5 +1,6 @@
 package edu.sustech.game.pane;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
+import javax.sound.sampled.*;
 import javax.tools.Tool;
 
 /**
@@ -31,8 +33,10 @@ public class CardMatrixPane extends StackPane {
     private GridPane gridPane;//卡片矩阵容器
     private CardPane[][] cps;//卡片矩阵
     private long score = 0;//分数,初始为0
+    private int step = 0;//步数，初始为0
     private List<String> record = new ArrayList<>();//记录
     private int usecount;
+    private int aiuse;
 
 
 
@@ -74,23 +78,41 @@ public class CardMatrixPane extends StackPane {
                 Map<String, Object> sc = gs.getScoreAndQuantities();
                 if (sc != null) {
                     usecount = ((Integer)sc.get("usecount")).intValue();
+                    aiuse = ((Integer)sc.get("aiuse")).intValue();
+                    step = ((Integer)sc.get("step")).intValue();
                     score = ((Long)sc.get("score")).longValue();
                     mcQuantities = (int[])sc.get("quantities");
                 }
 
                 record = gs.getRecord();
 
-
                 resumeGridPane();
+
+                if (aiuse!=0){
+                    //用Timer等待1.5秒
+                    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), ev -> {
+                        Alert alert=new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle(alert.getAlertType().toString());
+                        alert.setContentText("本存档已使用过AI，得分清空！");
+                        alert.show();
+                    }));
+                    timeline.play();
+
+
+                }
             }catch(Exception ex) {
                 ex.printStackTrace();
                 //异常时新开游戏
                 this.cols=4;
                 this.rows=4;
                 init();
-                Alert alert=new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("存档读取异常，已重置游戏");
-                alert.show();
+                Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1.5), ev -> {
+                    Alert alert=new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("存档读取异常，已重置游戏");
+                    alert.show();
+                }));
+                timeline.play();
+
             }
         }
         getChildren().add(gridPane);
@@ -148,6 +170,14 @@ public class CardMatrixPane extends StackPane {
         return usecount;
     }
 
+    public void setAiuse(int aiuse){
+        this.aiuse=aiuse;
+    }
+
+    public int getAiuse(){
+        return aiuse;
+    }
+
     private void init() {
         initGridPane();//初始化GridPane
         createRandomNumber();//在随机的空卡片上生成数字,这个方法会返回布尔值,但这里不需要
@@ -158,6 +188,7 @@ public class CardMatrixPane extends StackPane {
      */
     private void initGridPane() {
         setUsecount(0);
+        setAiuse(0);
         gridPane = new GridPane();
 //		gridPane.setBackground(new Background(new BackgroundFill(Color.YELLOW,CornerRadii.EMPTY,Insets.EMPTY)));//测试用
 //		gridPane.setGridLinesVisible(true);//单元格边框可见,测试用
@@ -175,9 +206,11 @@ public class CardMatrixPane extends StackPane {
                 CardPane card = new CardPane(0);
                 gridPane.add(card, i, j);
                 cps[i][j] = card;
+
             }
         }
     }
+
 
     private void resumeGridPane() {
 
@@ -268,9 +301,10 @@ public class CardMatrixPane extends StackPane {
             switch (kc) {
                 case UP:
                 case W:
-                    System.out.println("goUp02");
+
                     if(testUp()) {goUp();//↑
-                    afterAction();}
+                    afterAction();
+                    setStep(getStep()+1);}
                     if(isGameOver()){
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
@@ -295,7 +329,8 @@ public class CardMatrixPane extends StackPane {
                 case DOWN:
                 case S:
                     if(testDown()){goDown();//↓
-                    afterAction();}
+                    afterAction();
+                    setStep(getStep()+1);}
                     if(isGameOver()){
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
@@ -319,7 +354,8 @@ public class CardMatrixPane extends StackPane {
                 case LEFT:
                 case A:
                     if(testLeft()) {goLeft();//←
-                    afterAction();}
+                    afterAction();
+                    setStep(getStep()+1);}
                     if(isGameOver()){
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
@@ -343,7 +379,8 @@ public class CardMatrixPane extends StackPane {
                 case RIGHT:
                 case D:
                     if(testRight()) {goRight();//→
-                    afterAction();}
+                    afterAction();
+                    setStep(getStep()+1);}
                     if(isGameOver()){
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle(alert.getAlertType().toString());
@@ -381,8 +418,13 @@ public class CardMatrixPane extends StackPane {
 
     public void afterAction() {
         CardPane maxCard = getMaxCard();//最大卡片
-        redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
-
+        if(getGame().getToolMenu().soundEnabled){
+            playsound();
+        }if (aiuse==0) {
+            redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+        }else {
+            redrawAllCards();
+        }
         // 创建一个暂停0.07秒的动画
         PauseTransition pause = new PauseTransition(Duration.seconds(0.07));
         boolean[] testOpe = {false};//是否还能进行横向或竖向操作
@@ -418,8 +460,9 @@ public class CardMatrixPane extends StackPane {
 
     //无动画版本的afterAction，AI专用
     public void afterAction2() {
+        aiuse=1;
         CardPane maxCard = getMaxCard();//最大卡片
-        redrawAllCardsAndResetIsMergeAndSetScore();//重绘所有的卡片,并重设合并记录,更新分数:
+        redrawAllCards();//重绘所有的卡片,并重设合并记录,更新分数:
         createRandomNumber2();
 //        boolean[] testOpe = {true};//是否还能进行横向或竖向操作
 //
@@ -438,20 +481,19 @@ public class CardMatrixPane extends StackPane {
         boolean[] testOpe = {true};//是否还能进行横向或竖向操作
 
         boolean isFull = !isFull();//生成新的随机数字卡片,并判满,这包含了生成数字后满的情况
-        System.out.println(isFull);
+
 
         if (isFull) {//矩阵已满,可能已经游戏结束
             testOpe[0] = false;
             testOpe[0] |= testUp();//还能进行竖向操作
-            System.out.println(testOpe[0]);
+
             testOpe[0] |= testRight();//还能进行横向操作
-            System.out.println(testOpe[0]);
+
             testOpe[0] |= testLeft();//还能进行横向操作
-            System.out.println(testOpe[0]);
+
             testOpe[0] |= testDown();//还能进行竖向操作
-            System.out.println(testOpe[0]);
         }
-        System.out.println(!testOpe[0]);
+
         return !testOpe[0];
     }
 
@@ -736,6 +778,35 @@ public class CardMatrixPane extends StackPane {
     }
 
     /**
+     * AI用，重绘所有的卡片,并重设合并记录,不设置分数
+     */
+    private void redrawAllCards() {
+        setAiuse(1);
+        score=0;
+        for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
+            for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
+                CardPane card = cps[i][j];
+                card.draw();
+                if (card.isMerge()) {//这张卡片合并过
+                    mcQuantities[card.getType() - 2]++;//相应的合并过的卡片数字数量+1
+                    card.setMerge(false);
+                }
+            }
+        }
+        mCallbacks.afterScoreChange();
+    }
+
+
+    public void reDraw(){
+        for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
+            for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
+                CardPane card = cps[i][j];
+                card.draw();
+            }
+        }
+    }
+
+    /**
      * 获取卡片矩阵中的最大卡片
      */
     public CardPane getMaxCard() {
@@ -792,8 +863,8 @@ public class CardMatrixPane extends StackPane {
         ft.play();
         card.draw();//重绘此卡片
         ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(70), card);
-        scaleTransition.setToX(1.2f);
-        scaleTransition.setToY(1.2f);
+        scaleTransition.setToX(0.1f);
+        scaleTransition.setToY(0.1f);
         scaleTransition.setCycleCount(2);
         scaleTransition.setAutoReverse(true);
 
@@ -886,6 +957,8 @@ public class CardMatrixPane extends StackPane {
             }
         }
         usecount=0;
+        aiuse=0;
+        step=0;
         score = 0;//重设分数
         mcQuantities = new int[15];//重设合并过的卡片数字数量
         mCallbacks.afterScoreChange();
@@ -961,6 +1034,14 @@ public class CardMatrixPane extends StackPane {
         this.score = score;
     }
 
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
     public void setMcQuantities(int[] mcQuantities) {
         this.mcQuantities = mcQuantities;
     }
@@ -997,5 +1078,50 @@ public class CardMatrixPane extends StackPane {
     public List<String> getRecord() {
         return record;
     }
+
+    public int getCols(){
+        return cols;
+    }
+
+    public void soundeffect(int i){
+        try {
+            AudioInputStream audioInputStream1= AudioSystem.getAudioInputStream(new File("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\soundeffect2.wav"));
+            AudioInputStream audioInputStream2= AudioSystem.getAudioInputStream(new File("C:\\Users\\zhuzh\\IdeaProjects\\Project\\src\\game\\sources\\soundeffect2.wav"));
+            Clip clip = AudioSystem.getClip();
+            if (i==1) {
+                clip.open(audioInputStream1);
+                clip.start();
+            }
+            if (i==2) {
+                clip.open(audioInputStream2);
+                clip.start();
+            }
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void playsound() {
+        int count  =0;
+        for (int i = 0; i < cols; i++) {//遍历卡片矩阵的列
+            for (int j = 0; j < rows; j++) {//遍历卡片矩阵的行
+                CardPane card = cps[i][j];
+                if (card.isMerge()){
+                    count++;
+                }
+            }
+        }
+        if (count==0){
+            soundeffect(1);
+        }else{
+            soundeffect(2);
+        }
+    }
 }
+
 

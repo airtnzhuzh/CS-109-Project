@@ -44,34 +44,36 @@ public class Login extends Application{
         Button clear = new Button("清除");
         Button register = new Button("注册");
         Button guest = new Button("游客");
+        register.setPrefWidth(70);
+        login.setPrefWidth(70);
+        guest.setPrefWidth(170);
 
         GridPane gr=new GridPane();
         gr.setStyle("-fx-background-color: #FFF0F5");
 
-        gr.add(guest,0,0);
-        gr.add(l_name,0,1);
-        gr.add(t_name,1,1);
-        gr.add(l_password,0,2);
-        gr.add(p_password,1,2);
-        gr.add(clear,0,3);
-        gr.add(register,1,3);
-        gr.add(login,1,3);
+        gr.add(l_name,0,8);
+        gr.add(t_name,1,8);
+        gr.add(l_password,0,9);
+        gr.add(p_password,1,9);
+        gr.add(clear,2,8);
+        gr.add(register,1,10);
+        gr.add(login,1,10);
+        gr.add(guest,1,11);
 
         gr.setHgap(5);
         gr.setVgap(15);
 
-        gr.setMargin(register,new Insets(0,0,0,60));
-        gr.setMargin(login,new Insets(0,0,0,120));
+        gr.setMargin(register,new Insets(0,0,0,0));
+        gr.setMargin(login,new Insets(0,0,0,100));
         gr.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(gr);
         primaryStage.setScene(scene);
         primaryStage.setTitle("登录");
-        primaryStage.setWidth(500);
-        primaryStage.setHeight(300);
+        primaryStage.setWidth(450);
+        primaryStage.setHeight(650);
         primaryStage.setResizable(false);
         primaryStage.show();
-
 
         clear.setOnAction(event -> {
                 t_name.setText("");

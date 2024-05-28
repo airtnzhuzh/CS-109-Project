@@ -20,6 +20,7 @@ import org.w3c.dom.ls.LSOutput;
 //若继承自StackPane类,会出现一些绘制错误
 public class CardPane extends BorderPane {
 	private static final int RC=5;//矩形的圆角
+	private static int girdStyle = 0;
 	private int type;
 	/* 类型
 	 * type=0	number=0
@@ -31,7 +32,11 @@ public class CardPane extends BorderPane {
 	private boolean merge=false;//是否被合并过,如果合并了,则不能继续合并,针对当前轮
 	private Rectangle r;//圆角矩形
 	private Label l;//数字标签
-	
+	public static void setGirdStyle(int i) {
+		girdStyle = i;
+	}
+
+
 	/**无参构造方法*/
 	public CardPane() {
 		this(0);
@@ -47,7 +52,7 @@ public class CardPane extends BorderPane {
 		r.setArcWidth(RC);//圆角宽度
 		r.setArcHeight(RC);//圆角高度
 		r.setStroke(Color.BLACK);//边框颜色
-		r.setStrokeWidth(4);//边框宽度
+		r.setStrokeWidth(2);//边框宽度
 		getChildren().add(r);
 		//数字标签
 		l=new Label("65536");//65536是4*4情况下可能出现的最大数字
@@ -59,7 +64,6 @@ public class CardPane extends BorderPane {
 		r.setOnMouseClicked(event->{
 			setType(0);
 			this.draw();
-			if (getParent() instanceof Pane) System.out.println("OK");
 			getParent().setMouseTransparent(true);
 		});
 	}
@@ -94,18 +98,33 @@ public class CardPane extends BorderPane {
 	/**绘制单次操作中卡片变化的部分,包括颜色和显示的数字*/
 	public void draw() {
 		if(merge) {//突出显示已合并的卡片
-//		ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(1000), r);
-//		scaleTransition.setToX(1.2f);
-//		scaleTransition.setToY(1.2f);
-//		scaleTransition.setCycleCount(2);
-//		scaleTransition.setAutoReverse(true);
-//		scaleTransition.play();
+     ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(80), r);
+     scaleTransition.setToX(1.2f);
+     scaleTransition.setToY(1.2f);
+     scaleTransition.setCycleCount(2);
+     scaleTransition.setAutoReverse(true);
+     scaleTransition.play();
 			r.setStroke(Color.RED);//此次操作中合并,显示红色
 		}else {
 			r.setStroke(Color.BLACK);//此次操作中没有合并,显示黑色
 		}
-		r.setFill(CardColor.CB[type]);
+
+		if(girdStyle==0) {
+			r.setFill(CardColor.CB[type]);
+
+		}
+		else if(girdStyle==1){
+			r.setFill(CardColor.FORESTCB[type]);
+
+		}
+		else if(girdStyle==2){
+			r.setFill(CardColor.OCEANCB[type]);
+		}
+		else{
+			r.setFill(CardColor.DARKCB[type]);
+		}
 		drawNumber();
+
 	}
 	
 	/**判断此卡片能否向调用者所给出的卡片移动或合并*/

@@ -91,15 +91,39 @@ public class GameMenuBar extends MenuBar {
 		backgroundItem3.setOnAction(e -> game.setBackground(2));
 		backgroundItem4.setOnAction(e -> game.setBackground(3));
 		backgroundMenu.getItems().addAll(backgroundItem1, backgroundItem2, backgroundItem3, backgroundItem4);
+		//棋子风格菜单
+		Menu girdStyleMenu=new Menu("棋子风格");//背景
+// Create menu items with different backgrounds
+		MenuItem girdStyleItem1 = new MenuItem("经典");
+		MenuItem girdStyleItem2 = new MenuItem("森林");
+		MenuItem girdStyleItem3 = new MenuItem("海洋");
+		MenuItem girdStyleItem4 = new MenuItem("暗淡");
 
-		
+// Add event handlers to menu items
+		girdStyleItem1.setOnAction(e -> {CardPane.setGirdStyle(0);
+			game.getCardMatrixPane().reDraw();
+		});
+		girdStyleItem2.setOnAction(e -> {CardPane.setGirdStyle(1);
+			game.getCardMatrixPane().reDraw();
+		});
+		girdStyleItem3.setOnAction(e -> {CardPane.setGirdStyle(2);
+			game.getCardMatrixPane().reDraw();
+		});
+		girdStyleItem4.setOnAction(e -> {CardPane.setGirdStyle(3);
+			game.getCardMatrixPane().reDraw();
+		});
+		girdStyleMenu.getItems().addAll(girdStyleItem1, girdStyleItem2, girdStyleItem3, girdStyleItem4);
+
+
+
+
 		//Score菜单
 		scoreMenu=new Menu("分数");//分数
 		MenuItem moreScoreInfo=new MenuItem("更多分数信息");//更多分数信息
 		moreScoreInfo.setOnAction(e->mCallbacks.afterGetMoreScoreInfo());
 		scoreMenu.getItems().addAll(moreScoreInfo);
 		
-		getMenus().addAll(gameMenu,settingMenu,infoMenu,recordMenu,scoreMenu,backgroundMenu);
+		getMenus().addAll(gameMenu,settingMenu,infoMenu,recordMenu,scoreMenu,backgroundMenu,girdStyleMenu);
 	}
 	
 	/**获取分数菜单*/

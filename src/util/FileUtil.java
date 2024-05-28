@@ -1,4 +1,4 @@
-package edu.sustech.game.util;
+package edu.sustech.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,8 +11,8 @@ import java.security.NoSuchAlgorithmException;
 public class FileUtil {
 	
 	public static void main(String[] args) {
-		String filePath = "D:\\JavaProjects\\IdeaProjects\\Project\\game\\test.txt";
-		String hashFilePath = "D:\\JavaProjects\\IdeaProjects\\Project\\game\\test-h.txt";
+		String filePath = "C:\\Users\\zhuzh\\IdeaProjects\\Project\\game\\test.txt";
+		String hashFilePath = "C:\\Users\\zhuzh\\IdeaProjects\\Project\\game\\test-h.txt";
 		
 		try {
 			File file = new File(filePath);

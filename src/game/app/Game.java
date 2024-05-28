@@ -3,20 +3,30 @@ package edu.sustech.game.app;
 import edu.sustech.game.config.GameSaver;
 import edu.sustech.game.pane.GameAIMenu;
 import edu.sustech.game.pane.*;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 2048运行类
@@ -114,8 +124,10 @@ public class Game implements GameCallbacks {
 
 		//Right方向按钮
 		directionMenu = new DirectionMenu(cardMatrixPane);
+		directionMenu.setPadding(new Insets(5,5,5,5));
 		borderPane.setRight(directionMenu.getLayout());
-		borderPane.setPadding(new Insets(5,5,5,5));
+
+		borderPane.setPadding(new Insets(0,0,10,10));
 
 		stage.setTitle("2048");
 		stage.setScene(scene);
@@ -128,10 +140,85 @@ public class Game implements GameCallbacks {
 				}
 			}
 		});
-		
-//		startGame();
-//		cardMatrixPane.testColors();//颜色测试
+
+
+
+
+		// 显示步数step，时刻刷新
+		Label step = new Label("步数: " + cardMatrixPane.getStep());
+	    step.setFont(Font.font(20));
+		step.setStyle("-fx-background-color: #7bcc4c; -fx-padding: 10px;-fx-background-radius: 20px");
+		// 添加阴影效果
+		DropShadow dropShadow = new DropShadow();
+		dropShadow.setRadius(5);
+		dropShadow.setOffsetX(3);
+		dropShadow.setOffsetY(3);
+		dropShadow.setColor(Color.GRAY);
+		step.setEffect(dropShadow);
+
+		//定时保存
+		Label save = new Label();
+		save.setVisible(false);
+		save.setFont(Font.font(20));
+		save.setStyle("-fx-background-color: #7bcc4c; -fx-padding: 10px;-fx-background-radius: 20px");
+		// 添加阴影效果
+		save.setEffect(dropShadow);
+
+
+
+		HBox bottomBox = new HBox(10,step,save);
+
+
+		borderPane.setBottom(bottomBox);
+		Timer timer2 = new Timer();
+		timer2.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				Platform.runLater(() -> {
+					step.setText("步数: " + cardMatrixPane.getStep());
+				});
+			}
+		}, 0, 100);
+
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				Platform.runLater(() -> {
+					if(username!= null) {
+						autosave();
+						save.setText("已自动保存");
+						save.setVisible(true);
+						FadeTransition ft = new FadeTransition(Duration.millis(1000), save);
+						ft.setFromValue(0);
+						ft.setToValue(1);
+						ft.setCycleCount(1);
+						ft.setAutoReverse(true);
+						ft.play();
+						//4秒后隐藏
+						Timer timer = new Timer();
+						timer.schedule(new TimerTask() {
+							@Override
+							public void run() {
+								Platform.runLater(() -> {
+									save.setVisible(false);
+								});
+							}
+						}, 4000);
+					}
+					});
+			}
+		}, 0, 20000); // 每20秒刷新一次
+
+
+
+
+
 	}
+
+
+
+
 	public void setBackground(int i){
 		if(i == 0) {
 			borderPane.setBackground(background1);
@@ -184,6 +271,13 @@ public class Game implements GameCallbacks {
 		startGame();
 //		cardMatrixPane.testColors();//颜色测试
 	}
+	public CardMatrixPane getCardMatrixPane() {
+		return cardMatrixPane;
+	}
+
+	public GameAIMenu getToolMenu() {
+		return gameAIMenu;
+	}
  
 	@Override
 	public void afterScoreChange() {
@@ -233,6 +327,16 @@ public class Game implements GameCallbacks {
 		}
 	}
 
+	public void autosave()  {
+		//实现保存代码
+		if(username!= null){
+			try {
+				new GameSaver(username).save(cardMatrixPane);
+			} catch (IOException ex) {
+			}
+		}
+	}
+
 	@Override
 	public void getPastRecords() {
 		List<String> record=null;
@@ -259,5 +363,7 @@ public class Game implements GameCallbacks {
 		}
 		alert.show();
 	}
+
+
 }
 
